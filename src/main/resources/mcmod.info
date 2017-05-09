@@ -1,0 +1,16 @@
+[
+{
+  "modid": "iv",
+  "name": "Improved Villagers",
+  "description": "This mod improves villagers. ",
+  "version": "2.0.5",
+  "mcversion": "1.11-1.11.2",
+  "url": "https://minecraft.curseforge.com/projects/improved-villagers",
+  "updateUrl": "",
+  "authorList": ["OrangeVillager61"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
