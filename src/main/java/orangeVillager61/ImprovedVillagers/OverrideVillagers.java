@@ -29,7 +29,7 @@ public class OverrideVillagers {
 	@SubscribeEvent
 	public void entityJoinedWorldEventHandler(EntityJoinWorldEvent event)
 	{
-		if (event.getEntity().getClass() == EntityVillager.class && Config.overwriteOriginalVillagers == 0 && event.getWorld().isRemote == false)
+		if (event.getEntity().getClass() == EntityVillager.class && Config.overwriteOriginalVillagers && event.getWorld().isRemote == false)
 		{
 			event.getEntity().setDead();
 			doOverwriteVillager(event, (EntityVillager) event.getEntity());

@@ -721,7 +721,7 @@ public class VillageStructures
                 IBlockState iblockstate3 = this.getBiomeSpecificBlockState(Blocks.OAK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, EnumFacing.WEST));
                 IBlockState iblockstate4 = this.getBiomeSpecificBlockState(Blocks.PLANKS.getDefaultState());
                 IBlockState iblockstate5 = this.getBiomeSpecificBlockState(Blocks.LOG.getDefaultState());
-                IBlockState iblockstate9 = this.getBiomeSpecificBlockState(Blocks.DIRT.getDefaultState());
+                IBlockState iblockstate9 = this.getBiomeSpecificBlockState(Blocks.GRASS.getDefaultState());
                 IBlockState iblockstate6 = this.getBiomeSpecificBlockState(Blocks.OAK_FENCE.getDefaultState());
                 this.fillWithBlocks(worldIn, structureBoundingBoxIn, 1, 1, 1, 7, 4, 4, Blocks.AIR.getDefaultState(), Blocks.AIR.getDefaultState(), false);
                 this.fillWithBlocks(worldIn, structureBoundingBoxIn, 2, 1, 6, 8, 4, 10, Blocks.AIR.getDefaultState(), Blocks.AIR.getDefaultState(), false);
@@ -1738,7 +1738,10 @@ public class VillageStructures
                 {
                 	this.structureType = 4;
                 }
-
+                else if (biome instanceof BiomeForest)
+                {
+                	this.structureType = 5;
+                }
                 this.setStructureType(this.structureType);
                 this.isZombieInfested = rand.nextInt(50) == 0;
             }
@@ -2114,6 +2117,17 @@ public class VillageStructures
                     {
                         return Blocks.ACACIA_FENCE.getDefaultState();
                     }
+                }
+                else if (this.structureType == 5)
+                {
+                	if (blockstateIn.getBlock() == Blocks.STONE_STAIRS)
+                    {
+                        return Blocks.OAK_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, blockstateIn.getValue(BlockStairs.FACING));
+                    }
+                	 //if (blockstateIn.getBlock() == Blocks.COBBLESTONE)
+                     //{
+                       //  return Blocks.LOG.getDefaultState().withProperty(BlockOldLog.VARIANT, BlockPlanks.EnumType.OAK).withProperty(BlockLog.LOG_AXIS, blockstateIn.getValue(BlockLog.LOG_AXIS));
+                     //}
                 }
 
                 return blockstateIn;

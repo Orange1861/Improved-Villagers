@@ -22,8 +22,8 @@ public class Iv {
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent e) {
-	   proxy.preInit(e);
 	   Config.instance.load(e);
+	   proxy.preInit(e);
 	}
 
 	@EventHandler

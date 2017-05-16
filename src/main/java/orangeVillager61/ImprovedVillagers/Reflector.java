@@ -15,13 +15,14 @@ import orangeVillager61.ImprovedVillagers.generation.VillageStructures.Village;
 
 public class Reflector {
 	
-	public static void reflectMethod1(List<VillageStructures.PieceWeight> list, Random random, int size){
+	public static Object reflectMethod1(List<VillageStructures.PieceWeight> list, Random random, int size){
 		
 		Class reflectClass = net.minecraftforge.fml.common.registry.VillagerRegistry.class;
 		Method method;
 		try {
 			method = reflectClass.getMethod("addExtraVillageComponents", VillageStructures.PieceWeight.class, Random.class, int.class);
 			Object returnValue = method.invoke(null, list, random, size);
+			return returnValue;
 		} catch (NoSuchMethodException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -37,6 +38,9 @@ public class Reflector {
 		} catch (InvocationTargetException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		{
+		return null;
 		}
       }
 	public static Village reflectMethod2(VillageStructures.Start start, VillageStructures.PieceWeight weight, List<StructureComponent> structureComponents, Random rand, int structureMinX, int structureMinY, int structureMinZ, EnumFacing facing, int componentType){

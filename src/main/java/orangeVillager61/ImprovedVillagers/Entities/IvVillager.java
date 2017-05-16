@@ -53,9 +53,11 @@ public class IvVillager extends EntityVillager{
 	public int gender;
     protected boolean isWillingToMate;
     protected int wealth;
+    //public String Adult_Age;
+    //protected int int_Age;
     protected MerchantRecipeList buyingList;
-    //protected static final DataParameter<String> Name = EntityDataManager.<String>createKey(IvVillager.class, DataSerializers.STRING);
-    //protected static final DataParameter<Integer> Gender = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
+    private static final DataParameter<String> Adult_Age = EntityDataManager.<String>createKey(IvVillager.class, DataSerializers.STRING);
+    private static final DataParameter<Integer> int_Age = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
     private int careerId;
     private int careerLevel;
     private boolean isLookingForHome;
@@ -67,16 +69,19 @@ public class IvVillager extends EntityVillager{
 									"Mark", "Brian", "Robert", "Willam", "Harold", "Anthony", "Julius", 
 									"Mathew", "Tyler", "Noah", "Patrick", "Caden", "Michael", "Jeffery",
 									"James", "John", "Thomas", "Otto", "Bill", "Sheldon", "Leonard", 
-									"Howard", "Carter", "Theodore", "Herbert"};
+									"Howard", "Carter", "Theodore", "Herbert", "Paul", "Kurt", "Blaine",
+									"Ronald", "Christian", "Frederick", "Justinian", "Justin"};
 	public String[] female_list = {"Karen", "Lessie", "Kayla", "Brianna", "Isabella", "Elizabeth",
 									  "Kira", "Jadzia", "Abigail", "Chloe", "Olivia", "Sophia", "Emily", 
 									  "Charlotte", "Amelia", "Maria", "Daria", "Sarah", "Theodora",
 									  "Tia", "Jennifer", "Anglica", "Denna", "Tasha", "Catherine", "Lily",
-									  "Amy", "Penny", "Julina", "Audrey", "Avery"};
+									  "Amy", "Penny", "Julina", "Audrey", "Avery", "Hoshi", "Leia", "Rachel",
+									  "Tina", "Lacy", "Quinn", "Alexandra"};
 	
 	public IvVillager(World world) {
 		super(world);
         this.villagerInventory = new InventoryBasic("Items", false, 20);
+        this.setVillagerAge();
 	}
 	public IvVillager(World world, int professionId, int gender, String name) {
 		super(world, professionId);
@@ -85,6 +90,7 @@ public class IvVillager extends EntityVillager{
         this.gender = gender;
         this.name = name;
         this.setCustomNameTag(name);
+        this.setVillagerAge();
 	}
 	public InventoryBasic getVillagerInventory()
     {
@@ -94,8 +100,78 @@ public class IvVillager extends EntityVillager{
 	protected void entityInit()
     {
 		super.entityInit();
-		//this.getDataManager().register(Gender, Integer.valueOf(0));
-		//this.getDataManager().register(Name, String.valueOf("None"));
+		this.getDataManager().register(int_Age, Integer.valueOf(1));
+		this.getDataManager().register(Adult_Age, String.valueOf(""));
+    }
+	protected void setAdultAge(String name)
+    {
+        this.dataManager.set(Adult_Age, name);
+    }
+	protected void setIntAge(int num)
+    {
+        this.dataManager.set(int_Age, num);
+    }
+	public int getIntAge()
+    {
+          return (int)this.dataManager.get(int_Age);
+    }
+    public String getAdultAge()
+    {
+        return (String)this.dataManager.get(Adult_Age);
+    }
+    protected void setVillagerAge(){
+		if (this.isChild() == false)
+        {
+        	this.setIntAge(1);
+        	if (r.nextInt(6) == 0){
+        		this.setAdultAge("Elder");
+        	}
+        	else if (r.nextInt(2) == 0){
+        		this.setAdultAge("Young Adult");
+        	}
+        	else{
+        		this.setAdultAge("Middle Aged");
+        	}
+        }
+        else{
+        	this.setAdultAge("Child");
+        }
+	}
+	public void ivVillagerAdultAge(int lifeChangeNum){
+		if (world.isRemote == false){
+        	if (this.isChild() == false){
+        		if (this.getIntAge() >= lifeChangeNum){
+        			if (this.getAdultAge() == "Young Adult"){
+        	        	this.setIntAge(1);
+        				this.setAdultAge("Middle Aged");
+        			}
+        			else if (this.getAdultAge() == "Middle Aged"){
+        	        	this.setIntAge(1);
+        				this.setAdultAge("Elder");
+        			}
+        			else if (this.getAdultAge() == "Elder"){
+        				System.out.println("This dude is old");
+        				this.setIntAge(this.getIntAge() - 500);
+        			}
+        		}
+        		else{
+        				this.setIntAge(this.getIntAge() + 1);
+        			}
+        	}
+        }
+	}
+	@Override
+	public void onLivingUpdate()
+	    {
+	        super.onLivingUpdate();
+	        this.ivVillagerAdultAge(900);
+	    }
+	@Override
+	protected void onGrowingAdult()
+    {
+        super.onGrowingAdult();
+        this.setAdultAge("Young Adult");
+    	this.setIntAge(1);
     }
 	@Override
 	protected void initEntityAI()
@@ -111,7 +187,7 @@ public class IvVillager extends EntityVillager{
         this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityEvoker.class, 12.0F, 0.8D, 0.8D));
         this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityVindicator.class, 8.0F, 0.8D, 0.8D));
         this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityVex.class, 8.0F, 0.6D, 0.6D));
-        this.tasks.addTask(1, new EntityAIPanic(this, 0.55D));
+        this.tasks.addTask(1, new EntityAIPanic(this, 0.8D));
         this.tasks.addTask(1, new EntityAITradePlayer(this));
         this.tasks.addTask(2, new EntityAILookAtTradePlayer(this));
         this.tasks.addTask(2, new EntityAIMoveIndoors(this));
@@ -150,10 +226,13 @@ public class IvVillager extends EntityVillager{
 		        compound.setInteger("Profession", this.getProfession());
 		        compound.setString("ProfessionName", this.getProfessionForge().getRegistryName().toString());
 		        compound.setInteger("Riches", this.wealth);
+		        compound.setInteger("Int_Age", this.getIntAge());
 		        compound.setInteger("Career", this.careerId);
 		        compound.setInteger("CareerLevel", this.careerLevel);
 		        compound.setBoolean("Willing", this.isWillingToMate);
-	
+		        if ((this.getAdultAge() == "") == false){
+			        compound.setString("Adult_Age", this.getAdultAge());
+		        }
 		        if (this.buyingList != null)
 		        {
 		            compound.setTag("Offers", this.buyingList.getRecipiesAsTags());
@@ -177,7 +256,7 @@ public class IvVillager extends EntityVillager{
 	        		this.gender = r.nextInt(2) + 1;
 	        	}
 	        	compound.setInteger("Gender", this.gender);
-	        	if (this.name == null || this.name == "None" || this.name == "none"){
+	        	if (this.getCustomNameTag() == null || this.getCustomNameTag() == "None" || this.getCustomNameTag() == "none"){
 	        		if (this.gender == 1){
 	        			this.name = male_list[r.nextInt(male_list.length)];
 	        		}
@@ -202,6 +281,13 @@ public class IvVillager extends EntityVillager{
 			 this.gender = compound.getInteger("Gender");
 			 this.name = compound.getString("Name");
 			 //this.setCustomNameTag(this.name);
+		 }
+		 if (compound.hasKey("Adult_Age"))
+         {
+             this.setAdultAge(compound.getString("Adult_Age"));
+         }
+		 if (compound.hasKey("Int_Age")){
+			 this.setIntAge(compound.getInteger("Int_Age"));
 		 }
 		 this.setProfession(compound.getInteger("Profession"));
 	        if (compound.hasKey("ProfessionName"))
@@ -276,6 +362,7 @@ public class IvVillager extends EntityVillager{
 
 		}
         ItemStack itemstack = player.getHeldItem(hand);
+        System.out.println(this.getIntAge());
         if (itemstack.getItem() == IvItems.thieving_nose && !this.isChild()){
         	itemstack.damageItem(1, player);
         	this.setHealth(this.getHealth() - 2);
