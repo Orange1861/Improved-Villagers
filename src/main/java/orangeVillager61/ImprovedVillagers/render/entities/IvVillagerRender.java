@@ -141,7 +141,6 @@ public class IvVillagerRender extends RenderLiving<IvVillager>
             }
         	}
     	else{
-    		System.out.println(entity.getAdultAge());
     		return null;
     		}	
     }
