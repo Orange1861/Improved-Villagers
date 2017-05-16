@@ -164,7 +164,7 @@ public class IvVillager extends EntityVillager{
 	public void onLivingUpdate()
 	    {
 	        super.onLivingUpdate();
-	        this.ivVillagerAdultAge(900);
+	        this.ivVillagerAdultAge(360000);
 	    }
 	@Override
 	protected void onGrowingAdult()
