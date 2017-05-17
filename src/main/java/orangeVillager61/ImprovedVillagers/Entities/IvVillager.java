@@ -3,6 +3,7 @@ package orangeVillager61.ImprovedVillagers.Entities;
 import java.util.Random;
 
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIAvoidEntity;
 import net.minecraft.entity.ai.EntityAIFollowGolem;
 import net.minecraft.entity.ai.EntityAIHarvestFarmland;
@@ -141,22 +142,26 @@ public class IvVillager extends EntityVillager{
 		if (world.isRemote == false){
         	if (this.isChild() == false){
         		if (this.getIntAge() >= lifeChangeNum){
-        			if (this.getAdultAge() == "Young Adult"){
+        			if (this.getAdultAge().equals("Young Adult")){
         	        	this.setIntAge(1);
         				this.setAdultAge("Middle Aged");
         			}
-        			else if (this.getAdultAge() == "Middle Aged"){
+        			else if (this.getAdultAge().equals("Middle Aged")){
         	        	this.setIntAge(1);
         				this.setAdultAge("Elder");
         			}
-        			else if (this.getAdultAge() == "Elder"){
-        				System.out.println("This dude is old");
+        			else if (this.getAdultAge().equals("Elder")){
         				this.setIntAge(this.getIntAge() - 500);
         			}
         		}
         		else{
         				this.setIntAge(this.getIntAge() + 1);
         			}
+        		if(this.getAdultAge().equals("Elder"))
+        		{
+        			this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.4D);
+        		}
+        			
         	}
         }
 	}
@@ -230,7 +235,7 @@ public class IvVillager extends EntityVillager{
 		        compound.setInteger("Career", this.careerId);
 		        compound.setInteger("CareerLevel", this.careerLevel);
 		        compound.setBoolean("Willing", this.isWillingToMate);
-		        if ((this.getAdultAge() == "") == false){
+		        if ((this.getAdultAge().equals("")) == false){
 			        compound.setString("Adult_Age", this.getAdultAge());
 		        }
 		        if (this.buyingList != null)
@@ -362,7 +367,6 @@ public class IvVillager extends EntityVillager{
 
 		}
         ItemStack itemstack = player.getHeldItem(hand);
-        System.out.println(this.getIntAge());
         if (itemstack.getItem() == IvItems.thieving_nose && !this.isChild()){
         	itemstack.damageItem(1, player);
         	this.setHealth(this.getHealth() - 2);

@@ -1,6 +1,7 @@
 package orangeVillager61.ImprovedVillagers;
 
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.storage.loot.LootTableList;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -17,6 +18,8 @@ import orangeVillager61.ImprovedVillagers.Items.IvItems;
 import orangeVillager61.ImprovedVillagers.mobDrops.VillagerDrops;
 
 public class CommonProxy {
+
+	public static final ResourceLocation VILLAGE_BUTCHER_LT = LootTableList.register(new ResourceLocation("iv","village_butcher"));
 
 	@EventHandler
     public void preInit(FMLPreInitializationEvent e) {
