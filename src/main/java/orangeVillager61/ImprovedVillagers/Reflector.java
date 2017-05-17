@@ -25,7 +25,7 @@ public class Reflector {
 			return returnValue;
 		} catch (NoSuchMethodException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		} catch (SecurityException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -39,9 +39,7 @@ public class Reflector {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		{
 		return null;
-		}
       }
 	public static Village reflectMethod2(VillageStructures.Start start, VillageStructures.PieceWeight weight, List<StructureComponent> structureComponents, Random rand, int structureMinX, int structureMinY, int structureMinZ, EnumFacing facing, int componentType){
 		

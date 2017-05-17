@@ -20,6 +20,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.monster.EntityZombieVillager;
+import net.minecraft.entity.passive.EntityCow;
 import net.minecraft.entity.passive.EntityPig;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.init.Biomes;
@@ -44,6 +45,7 @@ import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureVillagePieces;
 import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraft.world.storage.loot.LootTableList;
+import orangeVillager61.ImprovedVillagers.CommonProxy;
 import orangeVillager61.ImprovedVillagers.Reflector;
 import orangeVillager61.ImprovedVillagers.Blocks.IvBlocks;
 
@@ -391,7 +393,7 @@ public class VillageStructures
                     }
                 }
 
-                this.spawnVillagers(worldIn, structureBoundingBoxIn, 2, 1, 2, 1);
+                this.spawnVillagers(worldIn, structureBoundingBoxIn, 2, 1, 2, 1, false);
                 return true;
             }
 
@@ -400,7 +402,7 @@ public class VillageStructures
                 return 2;
             }
         }
-
+    
     public static class Field1 extends VillageStructures.Village
         {
             /** First crop type for this field. */
@@ -776,6 +778,7 @@ public class VillageStructures
                 this.fillWithBlocks(worldIn, structureBoundingBoxIn, 5, 0, 1, 7, 0, 3, Blocks.DOUBLE_STONE_SLAB.getDefaultState(), Blocks.DOUBLE_STONE_SLAB.getDefaultState(), false);
                 this.setBlockState(worldIn, Blocks.DOUBLE_STONE_SLAB.getDefaultState(), 6, 1, 1, structureBoundingBoxIn);
                 this.setBlockState(worldIn, Blocks.DOUBLE_STONE_SLAB.getDefaultState(), 6, 1, 2, structureBoundingBoxIn);
+                this.generateChest(worldIn, structureBoundingBoxIn, randomIn, 7, 1, 1, CommonProxy.VILLAGE_BUTCHER_LT); 
                 this.setBlockState(worldIn, Blocks.AIR.getDefaultState(), 2, 1, 0, structureBoundingBoxIn);
                 this.setBlockState(worldIn, Blocks.AIR.getDefaultState(), 2, 2, 0, structureBoundingBoxIn);
                 this.placeTorch(worldIn, EnumFacing.NORTH, 2, 3, 1, structureBoundingBoxIn);
@@ -805,7 +808,7 @@ public class VillageStructures
                     }
                 }
 
-                this.spawnVillagers(worldIn, structureBoundingBoxIn, 4, 1, 2, 2);
+                this.spawnVillagers(worldIn, structureBoundingBoxIn, 4, 1, 2, 2, false);
                 this.spawnFarmAnimals(worldIn, structureBoundingBoxIn, 3, 1, 9, 4);
                 return true;
             }
@@ -815,7 +818,7 @@ public class VillageStructures
                 return villagersSpawnedIn == 0 ? 4 : super.chooseProfession(villagersSpawnedIn, currentVillagerProfession);
             }
         }
-
+    
     public static class House1 extends VillageStructures.Village
         {
             public House1()
@@ -945,7 +948,7 @@ public class VillageStructures
                     }
                 }
 
-                this.spawnVillagers(worldIn, structureBoundingBoxIn, 2, 1, 2, 1);
+                this.spawnVillagers(worldIn, structureBoundingBoxIn, 2, 1, 2, 1, false);
                 return true;
             }
 
@@ -1084,7 +1087,8 @@ public class VillageStructures
                     }
                 }
 
-                this.spawnVillagers(worldIn, structureBoundingBoxIn, 7, 1, 1, 1);
+                this.spawnVillagers(worldIn, structureBoundingBoxIn, 7, 1, 1, 1, false);
+                this.spawnVillagers(worldIn, structureBoundingBoxIn, 7, 1, 1, 1, true);
                 return true;
             }
 
@@ -1263,7 +1267,7 @@ public class VillageStructures
 	            }
 	        }
 	
-	        this.spawnVillagers(worldIn, structureBoundingBoxIn, 4, 1, 2, 2);
+	        this.spawnVillagers(worldIn, structureBoundingBoxIn, 4, 1, 2, 2, true);
 	        return true;
 	    }
 	}
@@ -1415,7 +1419,7 @@ public class VillageStructures
                     }
                 }
 
-                this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1);
+                this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1, true);
                 return true;
             }
         }
@@ -1807,6 +1811,7 @@ public class VillageStructures
             protected int structureType;
             protected boolean isZombieInfested;
             protected VillageStructures.Start startPiece;
+            public Random r = new Random();
 
             public Village()
             {
@@ -1962,10 +1967,19 @@ public class VillageStructures
                         entitypig.setLocationAndAngles((double)j + 0.5D, (double)k, (double)l + 0.5D, 0.0F, 0.0F);
                         entitypig.onInitialSpawn(worldIn.getDifficultyForLocation(new BlockPos(entitypig)), (IEntityLivingData)null);
                         entitypig.enablePersistence();
-                        worldIn.spawnEntity(entitypig);
+                        EntityCow entitycow= new EntityCow(worldIn);
+                        entitycow.setLocationAndAngles((double)j + 0.5D, (double)k, (double)l + 0.5D, 0.0F, 0.0F);
+                        entitycow.onInitialSpawn(worldIn.getDifficultyForLocation(new BlockPos(entitycow)), (IEntityLivingData)null);
+                        entitycow.enablePersistence();
+                        if (r.nextInt(2) == 0){
+                        	worldIn.spawnEntity(entitypig);
+                        }
+                        else{
+                        	worldIn.spawnEntity(entitycow);
+                        }
                    }
                    
-			protected void spawnVillagers(World worldIn, StructureBoundingBox structurebb, int x, int y, int z, int count)
+			protected void spawnVillagers(World worldIn, StructureBoundingBox structurebb, int x, int y, int z, int count, boolean allow_children)
 			{
 			    if (this.villagersSpawned < count)
 			    {
@@ -1996,6 +2010,11 @@ public class VillageStructures
 			                entityvillager.setLocationAndAngles((double)j + 0.5D, (double)k, (double)l + 0.5D, 0.0F, 0.0F);
 			                entityvillager.setProfession(this.chooseForgeProfession(i, entityvillager.getProfessionForge()));
 			                entityvillager.finalizeMobSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityvillager)), (IEntityLivingData)null, false);
+			                if (allow_children){
+			                	if (r.nextInt(2) == 0){
+			                		entityvillager.setGrowingAge(-23000);
+			                	}
+			                }
 			                worldIn.spawnEntity(entityvillager);
 			            }
 			        }
@@ -2033,7 +2052,10 @@ public class VillageStructures
                     {
                         return Blocks.SANDSTONE.getStateFromMeta(BlockSandStone.EnumType.SMOOTH.getMetadata());
                     }
-
+                    if (blockstateIn.getBlock() == Blocks.STONE_SLAB)
+                    {
+                    	return Blocks.STONE_SLAB2.getDefaultState();
+                    }
                     if (blockstateIn.getBlock() == Blocks.OAK_STAIRS)
                     {
                         return Blocks.SANDSTONE_STAIRS.getDefaultState().withProperty(BlockStairs.FACING, blockstateIn.getValue(BlockStairs.FACING));
@@ -2233,6 +2255,7 @@ public class VillageStructures
                 }
 
                 IBlockState iblockstate = this.getBiomeSpecificBlockState(Blocks.COBBLESTONE.getDefaultState());
+                IBlockState iblockstate2 = this.getBiomeSpecificBlockState(Blocks.STONE_SLAB.getDefaultState());
                 IBlockState iblockstate1 = this.getBiomeSpecificBlockState(Blocks.OAK_FENCE.getDefaultState());
                 this.fillWithBlocks(worldIn, structureBoundingBoxIn, 1, 0, 1, 4, 12, 4, iblockstate, Blocks.FLOWING_WATER.getDefaultState(), false);
                 this.setBlockState(worldIn, Blocks.AIR.getDefaultState(), 2, 12, 2, structureBoundingBoxIn);
@@ -2248,6 +2271,16 @@ public class VillageStructures
                 this.setBlockState(worldIn, iblockstate1, 4, 13, 4, structureBoundingBoxIn);
                 this.setBlockState(worldIn, iblockstate1, 4, 14, 4, structureBoundingBoxIn);
                 this.fillWithBlocks(worldIn, structureBoundingBoxIn, 1, 15, 1, 4, 15, 4, iblockstate, iblockstate, false);
+                this.setBlockState(worldIn, iblockstate2, 1, 12, 2, structureBoundingBoxIn);
+                this.setBlockState(worldIn, iblockstate2, 1, 12, 3, structureBoundingBoxIn);
+                this.setBlockState(worldIn, iblockstate2, 4, 12, 2, structureBoundingBoxIn);
+                this.setBlockState(worldIn, iblockstate2, 4, 12, 3, structureBoundingBoxIn);
+                this.setBlockState(worldIn, iblockstate2, 2, 12, 1, structureBoundingBoxIn);
+                this.setBlockState(worldIn, iblockstate2, 3, 12, 1, structureBoundingBoxIn);
+                this.setBlockState(worldIn, iblockstate2, 2, 12, 4, structureBoundingBoxIn);
+                this.setBlockState(worldIn, iblockstate2, 3, 12, 4, structureBoundingBoxIn);
+
+                
 
                 for (int i = 0; i <= 5; ++i)
                 {
@@ -2398,7 +2431,7 @@ public class VillageStructures
                     }
                 }
 
-                this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1);
+                this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1, true);
                 return true;
      
             }

@@ -22,7 +22,7 @@ public class VillagerDrops{
     @SubscribeEvent(priority=EventPriority.LOW, receiveCanceled=true)
 	public void onEvent(LivingDropsEvent event)
 	{
-    	if (Config.enableDrops){
+    	if (Config.enableDrops && event.getEntityLiving().isChild() == false){
 		    if (event.getEntity() instanceof EntityVillager || event.getEntity() instanceof IvVillager)
 		    {
 			        ItemStack itemStackToDrop1 = new ItemStack(Items.EMERALD,  r.nextInt(3) + 1);
