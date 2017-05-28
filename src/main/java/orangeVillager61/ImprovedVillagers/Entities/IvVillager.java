@@ -1,10 +1,18 @@
 package orangeVillager61.ImprovedVillagers.Entities;
 
 import java.util.Random;
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
+import com.google.common.base.Optional;
 
 import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.EntityAIAvoidEntity;
 import net.minecraft.entity.ai.EntityAIFollowGolem;
+import net.minecraft.entity.ai.EntityAIFollowOwner;
 import net.minecraft.entity.ai.EntityAIHarvestFarmland;
 import net.minecraft.entity.ai.EntityAILookAtTradePlayer;
 import net.minecraft.entity.ai.EntityAIMoveIndoors;
@@ -25,8 +33,10 @@ import net.minecraft.entity.monster.EntityEvoker;
 import net.minecraft.entity.monster.EntityVex;
 import net.minecraft.entity.monster.EntityVindicator;
 import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.item.ItemStack;
@@ -35,16 +45,24 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.datasync.DataParameter;
 import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
+import net.minecraft.server.management.PreYggdrasilConverter;
 import net.minecraft.stats.StatList;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.village.Village;
 import net.minecraft.world.World;
+import net.minecraftforge.items.CapabilityItemHandler;
+import orangeVillager61.ImprovedVillagers.Config;
+import orangeVillager61.ImprovedVillagers.Iv;
+import orangeVillager61.ImprovedVillagers.Reference;
 import orangeVillager61.ImprovedVillagers.Entities.AI.IvVilsPerDoor;
 import orangeVillager61.ImprovedVillagers.Entities.AI.VillagerAvoidEvilPlayer;
+import orangeVillager61.ImprovedVillagers.Entities.AI.VillagerFollowOwner;
 import orangeVillager61.ImprovedVillagers.Entities.AI.VilsPerDoor;
 import orangeVillager61.ImprovedVillagers.Items.IvItems;
+import orangeVillager61.ImprovedVillagers.client.gui.GuiHandler;
 
 public class IvVillager extends EntityVillager{
 	
@@ -53,9 +71,15 @@ public class IvVillager extends EntityVillager{
 	public int gender;
     protected boolean isWillingToMate;
     protected int wealth;
+    //public String Adult_Age;
+    //protected int int_Age;
     protected MerchantRecipeList buyingList;
-    //protected static final DataParameter<String> Name = EntityDataManager.<String>createKey(IvVillager.class, DataSerializers.STRING);
-    //protected static final DataParameter<Integer> Gender = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
+    protected static final DataParameter<Optional<UUID>> OWNER_DEFINED_ID = EntityDataManager.<Optional<UUID>>createKey(EntityTameable.class, DataSerializers.OPTIONAL_UNIQUE_ID);
+    private static final DataParameter<String> Adult_Age = EntityDataManager.<String>createKey(IvVillager.class, DataSerializers.STRING);
+    private static final DataParameter<Integer> int_Age = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
+    private static final DataParameter<Boolean> Is_Hired = EntityDataManager.<Boolean>createKey(IvVillager.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Integer> Hire_Cost = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
+    private static final DataParameter<Boolean> Following = EntityDataManager.<Boolean>createKey(IvVillager.class, DataSerializers.BOOLEAN);
     private int careerId;
     private int careerLevel;
     private boolean isLookingForHome;
@@ -67,16 +91,19 @@ public class IvVillager extends EntityVillager{
 									"Mark", "Brian", "Robert", "Willam", "Harold", "Anthony", "Julius", 
 									"Mathew", "Tyler", "Noah", "Patrick", "Caden", "Michael", "Jeffery",
 									"James", "John", "Thomas", "Otto", "Bill", "Sheldon", "Leonard", 
-									"Howard", "Carter", "Theodore", "Herbert"};
+									"Howard", "Carter", "Theodore", "Herbert", "Paul", "Kurt", "Blaine",
+									"Ronald", "Christian", "Frederick", "Justinian", "Justin"};
 	public String[] female_list = {"Karen", "Lessie", "Kayla", "Brianna", "Isabella", "Elizabeth",
 									  "Kira", "Jadzia", "Abigail", "Chloe", "Olivia", "Sophia", "Emily", 
 									  "Charlotte", "Amelia", "Maria", "Daria", "Sarah", "Theodora",
 									  "Tia", "Jennifer", "Anglica", "Denna", "Tasha", "Catherine", "Lily",
-									  "Amy", "Penny", "Julina", "Audrey", "Avery"};
+									  "Amy", "Penny", "Julina", "Audrey", "Avery", "Hoshi", "Leia", "Rachel",
+									  "Tina", "Lacy", "Quinn", "Alexandra"};
 	
 	public IvVillager(World world) {
 		super(world);
         this.villagerInventory = new InventoryBasic("Items", false, 20);
+        this.setVillagerAge();
 	}
 	public IvVillager(World world, int professionId, int gender, String name) {
 		super(world, professionId);
@@ -85,17 +112,197 @@ public class IvVillager extends EntityVillager{
         this.gender = gender;
         this.name = name;
         this.setCustomNameTag(name);
+        this.setVillagerAge();
 	}
 	public InventoryBasic getVillagerInventory()
     {
         return this.villagerInventory;
     }
+	
+	@Override
+	protected void applyEntityAttributes()
+    {
+        super.applyEntityAttributes();
+    }
+	
+	private void setMoreVillagerNbtStuff()
+    {
+        if (!this.areAdditionalTasksSet)
+        {
+            this.areAdditionalTasksSet = true;
+            if (this.getAdultAge().equals("Elder"))
+            {
+                this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(16.0D);
+                this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.45D);
+                this.setSize(0.6F, 1.8F);
+            }
+            else if (this.getAdultAge().equals("Middle Aged"))
+            {
+                this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20.0D);
+                this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.53D);
+            }
+            else if (this.getAdultAge().equals("Young Adult"))
+            {
+                this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(22.0D);
+                this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6D);
+            }
+            else if (this.isChild())
+            {
+                this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(16.0D);
+                this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6D);
+            }
+            else
+            {
+                this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.55D);
+                this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20.0D);
+                this.setSize(0.6F, 1.95F);
+            }
+
+            if (this.getHired())
+            {
+                this.tasks.addTask(6, new VillagerFollowOwner(this, 1.0D, 10.0F, 2.0F));
+            }
+        }
+    }
+	//@Override
+	//public void onDeath(DamageSource cause)
+    //{
+      //  if (!this.world.isRemote && this.world.getGameRules().getBoolean("showDeathMessages"))
+       // {
+        //    this.getOwner().sendMessage(this.getCombatTracker().getDeathMessage());
+        //}
+
+        //super.onDeath(cause);
+    //}
+    @Nullable
+    public EntityLivingBase getOwner()
+    {
+        try
+        {
+            UUID uuid = this.getOwnerId();
+            return uuid == null ? null : this.world.getPlayerEntityByUUID(uuid);
+        }
+        catch (IllegalArgumentException var2)
+        {
+            return null;
+        }
+    }
+    @Nullable
+    public UUID getOwnerId()
+    {
+    	System.out.println((UUID)((Optional)this.dataManager.get(OWNER_DEFINED_ID)).orNull());
+        return (UUID)((Optional)this.dataManager.get(OWNER_DEFINED_ID)).orNull();
+    }
+
+    public void setOwnerId(@Nullable UUID p_184754_1_)
+    {
+        this.dataManager.set(OWNER_DEFINED_ID, Optional.fromNullable(p_184754_1_));
+    }
 	@Override
 	protected void entityInit()
     {
 		super.entityInit();
-		//this.getDataManager().register(Gender, Integer.valueOf(0));
-		//this.getDataManager().register(Name, String.valueOf("None"));
+		this.getDataManager().register(int_Age, Integer.valueOf(1));
+		this.getDataManager().register(Adult_Age, String.valueOf(""));
+		this.getDataManager().register(Is_Hired, Boolean.valueOf(false));
+		this.getDataManager().register(Following, Boolean.valueOf(false));
+		this.getDataManager().register(Hire_Cost, Integer.valueOf(0));
+        //this.getDataManager().register(OWNER_DEFINED_ID, Optional.<UUID>absent());
+    }
+	protected void setAdultAge(String name)
+    {
+        this.dataManager.set(Adult_Age, name);
+    }
+	protected void setIntAge(int num)
+    {
+        this.dataManager.set(int_Age, num);
+    }
+	public int getHireCost()
+    {
+          return (int)this.dataManager.get(int_Age);
+    }
+	protected void setHireCost(int num)
+    {
+        this.dataManager.set(int_Age, num);
+    }
+	public int getIntAge()
+    {
+          return (int)this.dataManager.get(int_Age);
+    }
+	protected void setHired(boolean bool)
+    {
+        this.dataManager.set(Is_Hired, bool);
+    }
+	public boolean getHired()
+    {
+          return (boolean)this.dataManager.get(Is_Hired);
+    }
+	public void setFollowing(boolean bool)
+    {
+        this.dataManager.set(Following, bool);
+    }
+	public boolean getFollowing()
+    {
+          return (boolean)this.dataManager.get(Following);
+    }
+    public String getAdultAge()
+    {
+        return (String)this.dataManager.get(Adult_Age);
+    }
+    protected void setVillagerAge(){
+		if (this.isChild() == false)
+        {
+        	this.setIntAge(1);
+        	if (r.nextInt(6) == 0){
+        		this.setAdultAge("Elder");
+        	}
+        	else if (r.nextInt(2) == 0){
+        		this.setAdultAge("Young Adult");
+        	}
+        	else{
+        		this.setAdultAge("Middle Aged");
+        	}
+        }
+        else{
+        	this.setAdultAge("Child");
+        }
+	}
+	public void ivVillagerAdultAge(int lifeChangeNum){
+		if (world.isRemote == false){
+        	if (this.isChild() == false){
+        		if (this.getIntAge() >= lifeChangeNum){
+        			if (this.getAdultAge().equals("Young Adult")){
+        	        	this.setIntAge(1);
+        				this.setAdultAge("Middle Aged");
+        			}
+        			else if (this.getAdultAge().equals("Middle Aged")){
+        	        	this.setIntAge(1);
+        				this.setAdultAge("Elder");
+        			}
+        			else if (this.getAdultAge().equals("Elder")){
+        				this.setIntAge(this.getIntAge() - 500);
+        			}
+        		}
+        		else{
+        				this.setIntAge(this.getIntAge() + 1);
+        			}
+        			
+        	}
+        }
+	}
+	@Override
+	public void onLivingUpdate()
+	    {
+	        super.onLivingUpdate();
+	        this.ivVillagerAdultAge((Config.adult_days * 24000)/3);
+	        this.setMoreVillagerNbtStuff();
+	    }
+	@Override
+	protected void onGrowingAdult()
+    {
+        super.onGrowingAdult();
+        this.setAdultAge("Young Adult");
+    	this.setIntAge(1);
     }
 	@Override
 	protected void initEntityAI()
@@ -111,7 +318,7 @@ public class IvVillager extends EntityVillager{
         this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityEvoker.class, 12.0F, 0.8D, 0.8D));
         this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityVindicator.class, 8.0F, 0.8D, 0.8D));
         this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityVex.class, 8.0F, 0.6D, 0.6D));
-        this.tasks.addTask(1, new EntityAIPanic(this, 0.55D));
+        this.tasks.addTask(1, new EntityAIPanic(this, 0.8D));
         this.tasks.addTask(1, new EntityAITradePlayer(this));
         this.tasks.addTask(2, new EntityAILookAtTradePlayer(this));
         this.tasks.addTask(2, new EntityAIMoveIndoors(this));
@@ -126,7 +333,7 @@ public class IvVillager extends EntityVillager{
         this.tasks.addTask(10, new EntityAIWatchClosest2(this, EntityPlayer.class, 3.0F, 1.0F));
         this.tasks.addTask(10, new EntityAIWatchClosest(this, EntityLiving.class, 8.0F));
     }
-	private void setAdditionalAItasks()
+	protected void setAdditionalAItasks()
     {
         if (!this.areAdditionalTasksSet)
         {
@@ -147,13 +354,32 @@ public class IvVillager extends EntityVillager{
 	    {
 	        super.writeEntityToNBT(compound);
 	        if (world.isRemote == false){
+	        	if (this.getHireCost() == 0)
+	        	{
+	        		this.setHireCost(r.nextInt(21) + 20);
+	        	}
 		        compound.setInteger("Profession", this.getProfession());
 		        compound.setString("ProfessionName", this.getProfessionForge().getRegistryName().toString());
 		        compound.setInteger("Riches", this.wealth);
+		        compound.setInteger("Int_Age", this.getIntAge());
+		        compound.setInteger("Hire_Cost", this.getHireCost());
+		        compound.setBoolean("Is_Hired", this.getHired());
 		        compound.setInteger("Career", this.careerId);
 		        compound.setInteger("CareerLevel", this.careerLevel);
 		        compound.setBoolean("Willing", this.isWillingToMate);
-	
+		        if (this.getOwnerId() == null)
+		        {
+		            compound.setString("OwnerUUID", "");
+		        }
+		        else
+		        {
+		            compound.setString("OwnerUUID", this.getOwnerId().toString());
+		        }
+
+		        compound.setBoolean("Following", this.getFollowing());
+		        if ((this.getAdultAge().equals("")) == false){
+			        compound.setString("Adult_Age", this.getAdultAge());
+		        }
 		        if (this.buyingList != null)
 		        {
 		            compound.setTag("Offers", this.buyingList.getRecipiesAsTags());
@@ -177,7 +403,7 @@ public class IvVillager extends EntityVillager{
 	        		this.gender = r.nextInt(2) + 1;
 	        	}
 	        	compound.setInteger("Gender", this.gender);
-	        	if (this.name == null || this.name == "None" || this.name == "none"){
+	        	if (this.getCustomNameTag() == null || this.getCustomNameTag() == "None" || this.getCustomNameTag() == "none"){
 	        		if (this.gender == 1){
 	        			this.name = male_list[r.nextInt(male_list.length)];
 	        		}
@@ -195,14 +421,66 @@ public class IvVillager extends EntityVillager{
 	        }
 	        
 	    }
+	 
+	 public void hire_Villager(EntityPlayer player, int remaining_i)
+	 {
+		 if (!this.world.isRemote){
+			 this.setHired(true);
+	         this.setOwnerId(player.getUniqueID());
+     		 this.entityDropItem(new ItemStack(Items.EMERALD, remaining_i), 0);
+		 }
+	 }
+	 
 	 @Override
 	 public void readEntityFromNBT(NBTTagCompound compound){
 		 super.readEntityFromNBT(compound);
+	     String s;
 		 if (world.isRemote == false){
 			 this.gender = compound.getInteger("Gender");
 			 this.name = compound.getString("Name");
 			 //this.setCustomNameTag(this.name);
 		 }
+		 if (compound.hasKey("Adult_Age"))
+         {
+             this.setAdultAge(compound.getString("Adult_Age"));
+         }
+		 if (compound.hasKey("Is_Hired"))
+         {
+             this.setHired(compound.getBoolean("Is_Hired"));
+         }
+		 if (compound.hasKey("Following"))
+         {
+             this.setFollowing(compound.getBoolean("Following"));
+         }
+		 if (compound.hasKey("Int_Age")){
+			 this.setIntAge(compound.getInteger("Int_Age"));
+		 }
+		 if (compound.hasKey("Hire_Cost")){
+			 this.setIntAge(compound.getInteger("Hire_Cost"));
+		 }
+		 if (compound.hasKey("OwnerUUID", 8))
+	        {
+	            s = compound.getString("OwnerUUID");
+	        }
+	        else
+	        {
+	            String s1 = compound.getString("Owner");
+	            s = PreYggdrasilConverter.convertMobOwnerIfNeeded(this.getServer(), s1);
+	        }
+
+	        if (!s.isEmpty())
+	        {
+	            try
+	            {
+	                this.setOwnerId(UUID.fromString(s));
+	                this.setHired(true);
+	            }
+	            catch (Throwable var4)
+	            {
+	                this.setHired(false);
+	            }
+	        }
+
 		 this.setProfession(compound.getInteger("Profession"));
 	        if (compound.hasKey("ProfessionName"))
 	        {
@@ -237,9 +515,10 @@ public class IvVillager extends EntityVillager{
 
 	        this.setCanPickUpLoot(true);
 	        this.setAdditionalAItasks();
+	        this.setMoreVillagerNbtStuff();
 		 
 	 }
-	 private void populateBuyingList()
+	 protected void populateBuyingList()
 	    {
 	        if (this.careerId != 0 && this.careerLevel != 0)
 	        {
@@ -296,6 +575,18 @@ public class IvVillager extends EntityVillager{
 	            }
         	}
             return true;
+        }
+        else if (this.getHired() == false && this.getProfession() == 5 && !world.isRemote && !this.isChild())
+        {
+    		BlockPos blockpos = new BlockPos(this);
+        	player.openGui(Iv.instance, GuiHandler.Villager_Hire, world, blockpos.getX(), blockpos.getY(), blockpos.getZ());
+        	return true;
+        }
+        else if (this.getHired() == true && this.getProfession() == 5 && !world.isRemote && !this.isChild())
+        {
+			BlockPos blockpos = new BlockPos(this);
+        	player.openGui(Iv.instance, GuiHandler.Hauler, world, blockpos.getX(), blockpos.getY(), blockpos.getZ());
+        	return true;
         }
         else if (!this.holdingSpawnEggOfClass(itemstack, this.getClass()) && this.isEntityAlive() && !this.isTrading() && !this.isChild())
         {

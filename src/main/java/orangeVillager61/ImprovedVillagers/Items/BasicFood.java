@@ -13,8 +13,6 @@ import orangeVillager61.ImprovedVillagers.Reference;
 public class BasicFood extends ItemFood{
 	
 	private final PotionEffect[] effects;
-
-	
 	       
 	public BasicFood(String name, int amount, float saturation, boolean isWolfFood, PotionEffect... effects) {
         super(amount, saturation, isWolfFood); 

@@ -14,7 +14,6 @@ public class ChangeVillageGeneration {
 			IvMapGenVillage newGen = new IvMapGenVillage();
 			event.setNewGen(newGen);
 		}
-
 	}	
 	
 }

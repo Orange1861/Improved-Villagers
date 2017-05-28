@@ -23,7 +23,7 @@ public class IvRecipes {
 	     NBTTagCompound nbttagcompound1 = new NBTTagCompound();
 	     nbttagcompound1.setString("id", entityId);
 	     nbttagcompound.setTag("EntityTag", nbttagcompound1);
-	     stack.setTagCompound(nbttagcompound);
+	     stack.setTagCompound(nbttagcompound); 
 	 }
 	 
 	 public static void addRecipes() {

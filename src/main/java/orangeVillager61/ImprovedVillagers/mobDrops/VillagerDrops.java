@@ -22,28 +22,28 @@ public class VillagerDrops{
     @SubscribeEvent(priority=EventPriority.LOW, receiveCanceled=true)
 	public void onEvent(LivingDropsEvent event)
 	{
-    	if (Config.enableDrops == 0){
+    	if (Config.enableDrops && event.getEntityLiving().isChild() == false){
 		    if (event.getEntity() instanceof EntityVillager || event.getEntity() instanceof IvVillager)
 		    {
-		        ItemStack itemStackToDrop1 = new ItemStack(Items.EMERALD,  r.nextInt(3) + 1);
-		        ItemStack itemStackToDrop2 = new ItemStack(Items.BONE,  r.nextInt(1));
-		        if (event.getEntity().isBurning()){
-		        ItemStack itemStackToDrop4 = new ItemStack(IvItems.cooked_villager,  r.nextInt(2) + 1);
-		        event.getDrops().add(new EntityItem(event.getEntity().world, event.getEntity().posX, 
-			        	  event.getEntity().posY, event.getEntity().posZ, itemStackToDrop4));
-		        }
-		        else if (!event.getEntity().isBurning()){
-			        ItemStack itemStackToDrop4 = new ItemStack(IvItems.raw_villager,  r.nextInt(2) + 1);
+			        ItemStack itemStackToDrop1 = new ItemStack(Items.EMERALD,  r.nextInt(3) + 1);
+			        ItemStack itemStackToDrop2 = new ItemStack(Items.BONE,  r.nextInt(1));
+			        if (event.getEntity().isBurning()){
+			        ItemStack itemStackToDrop4 = new ItemStack(IvItems.cooked_villager,  r.nextInt(2) + 1);
 			        event.getDrops().add(new EntityItem(event.getEntity().world, event.getEntity().posX, 
 				        	  event.getEntity().posY, event.getEntity().posZ, itemStackToDrop4));
-		        }
-		        ItemStack itemStackToDrop3 = new ItemStack(IvBlocks.villager_nose,  r.nextInt(1) + 1);
-		        event.getDrops().add(new EntityItem(event.getEntity().world, event.getEntity().posX, 
-			        	  event.getEntity().posY, event.getEntity().posZ, itemStackToDrop1));
-		        event.getDrops().add(new EntityItem(event.getEntity().world, event.getEntity().posX, 
-			        	  event.getEntity().posY, event.getEntity().posZ, itemStackToDrop2));
-		        event.getDrops().add(new EntityItem(event.getEntity().world, event.getEntity().posX, 
-			        	  event.getEntity().posY, event.getEntity().posZ, itemStackToDrop3));
+			        }
+			        else if (!event.getEntity().isBurning()){
+				        ItemStack itemStackToDrop4 = new ItemStack(IvItems.raw_villager,  r.nextInt(2) + 1);
+				        event.getDrops().add(new EntityItem(event.getEntity().world, event.getEntity().posX, 
+					        	  event.getEntity().posY, event.getEntity().posZ, itemStackToDrop4));
+			        }
+			        ItemStack itemStackToDrop3 = new ItemStack(IvBlocks.villager_nose,  r.nextInt(1) + 1);
+			        event.getDrops().add(new EntityItem(event.getEntity().world, event.getEntity().posX, 
+				        	  event.getEntity().posY, event.getEntity().posZ, itemStackToDrop1));
+			        event.getDrops().add(new EntityItem(event.getEntity().world, event.getEntity().posX, 
+				        	  event.getEntity().posY, event.getEntity().posZ, itemStackToDrop2));
+			        event.getDrops().add(new EntityItem(event.getEntity().world, event.getEntity().posX, 
+				        	  event.getEntity().posY, event.getEntity().posZ, itemStackToDrop3));
 		        
 		    }
 		    

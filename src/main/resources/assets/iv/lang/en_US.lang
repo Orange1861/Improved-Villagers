@@ -2,6 +2,7 @@
 item.raw_villager.name=Raw Villager
 item.cooked_villager.name=Cooked Villager
 item.thieving_nose.name=Thieving Nose
+item.notification_marker.name=Notification Marker
 
 //Blocks
 tile.villager_nose.name=Villager Nose

@@ -140,7 +140,7 @@ public class IvVilsPerDoor extends EntityAIBase
         EntityVillager entityvillager2 = this.villagerObj.createChild(this.mate);
         this.mate.setGrowingAge(6000);
         this.villagerObj.setGrowingAge(6000);
-        if (Config.MateAgain == 0){
+        if (Config.MateAgain){
         	mateAgain = rand.nextInt(3) + 1;
         }
         else{

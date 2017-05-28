@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.oredict.OreDictionary;
 
-@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, updateJSON = "https://raw.githubusercontent.com/Orange1861/update.json/master/update3.json", acceptedMinecraftVersions = "1.11-1.11.2")
+@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, updateJSON = "https://raw.githubusercontent.com/Orange1861/update.json/master/update3.json", acceptedMinecraftVersions = "1.10.2-1.11.2")
 public class Iv {
 	
 	@Instance
@@ -22,8 +22,8 @@ public class Iv {
 	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent e) {
-	   proxy.preInit(e);
 	   Config.instance.load(e);
+	   proxy.preInit(e);
 	}
 
 	@EventHandler
