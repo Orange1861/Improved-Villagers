@@ -14,7 +14,7 @@ public class ContainerIvVillagerHauler extends Container{
 
 	private IvVillager villager;
 	
-	private IItemHandler handler = this.villager.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+	private IItemHandler handler; 
 
 	
 	public ContainerIvVillagerHauler(IvVillager villager, IInventory playerInv){
@@ -79,7 +79,6 @@ public class ContainerIvVillagerHauler extends Container{
 	            slot.onSlotChanged();
 
 	        if (current.getCount() == previous.getCount())
-	            return null;
 	        slot.onTake(playerIn, current);
 	    }
 	    return previous;

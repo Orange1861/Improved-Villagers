@@ -1,6 +1,8 @@
 package orangeVillager61.ImprovedVillagers.Entities;
 
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -74,7 +76,7 @@ public class IvVillager extends EntityVillager{
     //public String Adult_Age;
     //protected int int_Age;
     protected MerchantRecipeList buyingList;
-    protected static final DataParameter<Optional<UUID>> OWNER_DEFINED_ID = EntityDataManager.<Optional<UUID>>createKey(EntityTameable.class, DataSerializers.OPTIONAL_UNIQUE_ID);
+    protected static final DataParameter<Optional<UUID>> OWNER_DEFINED_ID = EntityDataManager.<Optional<UUID>>createKey(IvVillager.class, DataSerializers.OPTIONAL_UNIQUE_ID);
     private static final DataParameter<String> Adult_Age = EntityDataManager.<String>createKey(IvVillager.class, DataSerializers.STRING);
     private static final DataParameter<Integer> int_Age = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
     private static final DataParameter<Boolean> Is_Hired = EntityDataManager.<Boolean>createKey(IvVillager.class, DataSerializers.BOOLEAN);
@@ -86,6 +88,7 @@ public class IvVillager extends EntityVillager{
     private boolean areAdditionalTasksSet;
     protected final InventoryBasic villagerInventory;
     Random r = new Random();
+    protected ArrayList<UUID> note_list = new ArrayList<UUID>(0);
     /** A multi-dimensional array mapping the various professions, careers and career levels that a Villager may offer */
 	public String[] male_list = {"Bob", "Joseph", "Aaron", "Philp", "Adam", "Paul", "Donald", "Ryan", 
 									"Mark", "Brian", "Robert", "Willam", "Harold", "Anthony", "Julius", 
@@ -164,16 +167,43 @@ public class IvVillager extends EntityVillager{
             }
         }
     }
-	//@Override
-	//public void onDeath(DamageSource cause)
-    //{
-      //  if (!this.world.isRemote && this.world.getGameRules().getBoolean("showDeathMessages"))
-       // {
-        //    this.getOwner().sendMessage(this.getCombatTracker().getDeathMessage());
-        //}
+	public void addNoteList(UUID player_to_add)
+	{
+		if (!this.note_list.contains(player_to_add))
+		{
+			this.note_list.add(player_to_add);
+		}
+	}
+	public ArrayList<UUID> getNoteList()
+	{
+		return this.note_list;
+	}
+	@Nullable
+    public EntityLivingBase getNotePlayer(int num)
+    {
+        try
+        {
+            UUID uuid = this.getNoteList().get(num);
+            return uuid == null ? null : this.world.getPlayerEntityByUUID(uuid);
+        }
+        catch (IllegalArgumentException var2)
+        {
+            return null;
+        }
+    }
+	@Override
+	public void onDeath(DamageSource cause)
+    {
+       if (!this.world.isRemote && this.world.getGameRules().getBoolean("showDeathMessages") && (this.note_list == null) == false)
+       {
+    	   for (int a = 0; a < this.getNoteList().size(); a++)
+    	   {
+    		   this.getNotePlayer(a).sendMessage(this.getCombatTracker().getDeathMessage());
+    	   }
+       }
 
-        //super.onDeath(cause);
-    //}
+       super.onDeath(cause);
+    }
     @Nullable
     public EntityLivingBase getOwner()
     {
@@ -207,7 +237,7 @@ public class IvVillager extends EntityVillager{
 		this.getDataManager().register(Is_Hired, Boolean.valueOf(false));
 		this.getDataManager().register(Following, Boolean.valueOf(false));
 		this.getDataManager().register(Hire_Cost, Integer.valueOf(0));
-        //this.getDataManager().register(OWNER_DEFINED_ID, Optional.<UUID>absent());
+        this.getDataManager().register(OWNER_DEFINED_ID, Optional.<UUID>absent());
     }
 	protected void setAdultAge(String name)
     {
@@ -367,6 +397,11 @@ public class IvVillager extends EntityVillager{
 		        compound.setInteger("Career", this.careerId);
 		        compound.setInteger("CareerLevel", this.careerLevel);
 		        compound.setBoolean("Willing", this.isWillingToMate);
+		        
+		        for (int b = 0; b < this.getNoteList().size(); b++)
+		        {
+		        	compound.setUniqueId("UUID Note " + Integer.toString(b), this.getNoteList().get(b));
+		        }
 		        if (this.getOwnerId() == null)
 		        {
 		            compound.setString("OwnerUUID", "");
@@ -440,6 +475,10 @@ public class IvVillager extends EntityVillager{
 			 this.name = compound.getString("Name");
 			 //this.setCustomNameTag(this.name);
 		 }
+	     for (int b = 0; b < this.getNoteList().size(); b++)
+	     {
+	         this.addNoteList(compound.getUniqueId("UUID Note " + Integer.toString(b)));
+	     }
 		 if (compound.hasKey("Adult_Age"))
          {
              this.setAdultAge(compound.getString("Adult_Age"));
@@ -575,6 +614,11 @@ public class IvVillager extends EntityVillager{
 	            }
         	}
             return true;
+        }
+        else if (itemstack.getItem() == IvItems.notification_marker)
+        {
+        	this.addNoteList(player.getUniqueID());
+        	return true;
         }
         else if (this.getHired() == false && this.getProfession() == 5 && !world.isRemote && !this.isChild())
         {

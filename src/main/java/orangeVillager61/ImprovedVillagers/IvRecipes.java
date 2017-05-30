@@ -28,6 +28,7 @@ public class IvRecipes {
 	 
 	 public static void addRecipes() {
 		 GameRegistry.addShapelessRecipe(new ItemStack (IvItems.thieving_nose), Items.EMERALD, IvBlocks.villager_nose);
+		 GameRegistry.addShapelessRecipe(new ItemStack (IvItems.notification_marker), Items.EMERALD, new ItemStack (Items.IRON_INGOT, 2));
 		 GameRegistry.addRecipe(new ItemStack(IvBlocks.light_blue_stairs), new Object[]
 	    		  {"B  ", 
 	    		   "BB ", 

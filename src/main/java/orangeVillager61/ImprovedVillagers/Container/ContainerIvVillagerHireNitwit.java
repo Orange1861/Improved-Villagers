@@ -13,7 +13,7 @@ import orangeVillager61.ImprovedVillagers.Entities.IvVillager;
 public class ContainerIvVillagerHireNitwit extends Container{
 
 	private IvVillager villager;
-	private IItemHandler handler = this.villager.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+	private IItemHandler handler;
 	
 	public ContainerIvVillagerHireNitwit(IvVillager villager, IInventory playerInv){
 		IItemHandler handler = this.villager.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
@@ -62,7 +62,6 @@ public class ContainerIvVillagerHireNitwit extends Container{
 	            slot.onSlotChanged();
 
 	        if (current.getCount() == previous.getCount())
-	            return null;
 	        slot.onTake(playerIn, current);
 	    }
 	    return previous;
