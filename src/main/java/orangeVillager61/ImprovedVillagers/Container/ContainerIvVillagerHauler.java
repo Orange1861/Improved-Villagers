@@ -18,7 +18,8 @@ public class ContainerIvVillagerHauler extends Container{
 
 	
 	public ContainerIvVillagerHauler(IvVillager villager, IInventory playerInv){
-		IItemHandler handler = this.villager.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+		this.villager = villager;
+		this.handler = this.villager.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 
 		this.addSlotToContainer(new SlotItemHandler(handler, 0, 44, 23));
 		this.addSlotToContainer(new SlotItemHandler(handler, 1, 62, 23));

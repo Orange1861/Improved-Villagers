@@ -16,7 +16,8 @@ public class ContainerIvVillagerHireNitwit extends Container{
 	private IItemHandler handler;
 	
 	public ContainerIvVillagerHireNitwit(IvVillager villager, IInventory playerInv){
-		IItemHandler handler = this.villager.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+		this.villager = villager;
+		this.handler = this.villager.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 
 		this.addSlotToContainer(new SlotItemHandler(handler, 0, 76, 47));
 		int xPos = 8;
