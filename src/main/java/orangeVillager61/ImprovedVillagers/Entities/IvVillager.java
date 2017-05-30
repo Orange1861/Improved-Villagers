@@ -257,11 +257,11 @@ public class IvVillager extends EntityVillager{
     }
 	public int getHireCost()
     {
-          return (int)this.dataManager.get(int_Age);
+          return this.dataManager.get(Hire_Cost);
     }
 	protected void setHireCost(int num)
     {
-        this.dataManager.set(int_Age, num);
+        this.dataManager.set(Hire_Cost, num);
     }
 	public int getIntAge()
     {
