@@ -16,7 +16,8 @@ public class ContainerIvVillagerHireNitwit extends Container{
 	private IItemHandler handler;
 	
 	public ContainerIvVillagerHireNitwit(IvVillager villager, IInventory playerInv){
-		IItemHandler handler = this.villager.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+		this.villager = villager;
+		this.handler = this.villager.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 
 		this.addSlotToContainer(new SlotItemHandler(handler, 0, 76, 47));
 		int xPos = 8;
@@ -34,8 +35,7 @@ public class ContainerIvVillagerHireNitwit extends Container{
 	}
 	@Override
 	public boolean canInteractWith(EntityPlayer player) {
-		// TODO Auto-generated method stub
-		return false;
+		return villager.getDistanceToEntity(player) < 8;
 	}
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {

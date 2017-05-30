@@ -55,6 +55,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.village.Village;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
+import net.minecraftforge.fml.common.registry.VillagerRegistry.VillagerProfession;
 import net.minecraftforge.items.CapabilityItemHandler;
 import orangeVillager61.ImprovedVillagers.Config;
 import orangeVillager61.ImprovedVillagers.Iv;
@@ -68,6 +70,12 @@ import orangeVillager61.ImprovedVillagers.client.gui.GuiHandler;
 
 public class IvVillager extends EntityVillager{
 	
+	@ObjectHolder("minecraft:farmer")
+	public static VillagerProfession PROFESSION_FARMER = null;
+
+	@ObjectHolder("minecraft:nitwit")
+	public static VillagerProfession PROFESSION_NITWIT = null;
+
 	protected Village villageObj; 
 	public String name;
 	public int gender;
@@ -249,11 +257,11 @@ public class IvVillager extends EntityVillager{
     }
 	public int getHireCost()
     {
-          return (int)this.dataManager.get(int_Age);
+          return this.dataManager.get(Hire_Cost);
     }
 	protected void setHireCost(int num)
     {
-        this.dataManager.set(int_Age, num);
+        this.dataManager.set(Hire_Cost, num);
     }
 	public int getIntAge()
     {
@@ -373,7 +381,7 @@ public class IvVillager extends EntityVillager{
             {
                 this.tasks.addTask(8, new EntityAIPlay(this, 0.32D));
             }
-            else if (this.getProfession() == 0)
+            else if (this.getProfessionForge() == PROFESSION_FARMER)
             {
                 this.tasks.addTask(6, new EntityAIHarvestFarmland(this, 0.6D));
             }
@@ -620,16 +628,20 @@ public class IvVillager extends EntityVillager{
         	this.addNoteList(player.getUniqueID());
         	return true;
         }
-        else if (this.getHired() == false && this.getProfession() == 5 && !world.isRemote && !this.isChild())
+        else if (!this.getHired() && this.getProfessionForge() == PROFESSION_NITWIT && !this.isChild())
         {
-    		BlockPos blockpos = new BlockPos(this);
-        	player.openGui(Iv.instance, GuiHandler.Villager_Hire, world, blockpos.getX(), blockpos.getY(), blockpos.getZ());
+        	if (!world.isRemote) {
+	            player.openGui(Iv.instance, GuiHandler.Villager_Hire, world, getEntityId(), 0, 0);
+        	}
+
         	return true;
         }
-        else if (this.getHired() == true && this.getProfession() == 5 && !world.isRemote && !this.isChild())
+        else if (this.getHired() && this.getProfessionForge() == PROFESSION_NITWIT && !this.isChild())
         {
-			BlockPos blockpos = new BlockPos(this);
-        	player.openGui(Iv.instance, GuiHandler.Hauler, world, blockpos.getX(), blockpos.getY(), blockpos.getZ());
+        	if (!world.isRemote) {
+	            player.openGui(Iv.instance, GuiHandler.Hauler, world, getEntityId(), 0, 0);
+        	}
+
         	return true;
         }
         else if (!this.holdingSpawnEggOfClass(itemstack, this.getClass()) && this.isEntityAlive() && !this.isTrading() && !this.isChild())
