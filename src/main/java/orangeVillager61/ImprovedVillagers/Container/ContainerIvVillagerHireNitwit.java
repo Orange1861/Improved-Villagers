@@ -35,8 +35,7 @@ public class ContainerIvVillagerHireNitwit extends Container{
 	}
 	@Override
 	public boolean canInteractWith(EntityPlayer player) {
-		// TODO Auto-generated method stub
-		return false;
+		return villager.getDistanceToEntity(player) < 8;
 	}
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
