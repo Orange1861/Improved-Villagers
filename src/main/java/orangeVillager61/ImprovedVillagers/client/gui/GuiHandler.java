@@ -19,10 +19,10 @@ public class GuiHandler implements IGuiHandler{
 		BlockPos pos = new BlockPos(x, y, z);
 		AxisAlignedBB vilSearch = new AxisAlignedBB(pos);
 		if (ID == Villager_Hire){
-			return new ContainerIvVillagerHireNitwit((IvVillager)world.getEntitiesWithinAABB(IvVillager.class, vilSearch).get(0), player.inventory);
+			return new ContainerIvVillagerHireNitwit(world.getEntitiesWithinAABB(IvVillager.class, vilSearch).get(0), player.inventory);
 		}
 		else if (ID == Hauler){
-			return new ContainerIvVillagerHauler((IvVillager)world.getEntitiesWithinAABB(IvVillager.class, vilSearch).get(0), player.inventory);
+			return new ContainerIvVillagerHauler(world.getEntitiesWithinAABB(IvVillager.class, vilSearch).get(0), player.inventory);
 		}
 		else {
 			return null;
