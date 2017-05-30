@@ -75,7 +75,7 @@ public class IvVillager extends EntityVillager{
 
 	@ObjectHolder("minecraft:nitwit")
 	public static VillagerProfession PROFESSION_NITWIT = null;
-
+	
 	protected Village villageObj; 
 	public String name;
 	public int gender;
@@ -124,6 +124,7 @@ public class IvVillager extends EntityVillager{
         this.name = name;
         this.setCustomNameTag(name);
         this.setVillagerAge();
+        this.setHireCost(r.nextInt(21) + 20);
 	}
 	public InventoryBasic getVillagerInventory()
     {
@@ -156,6 +157,10 @@ public class IvVillager extends EntityVillager{
             {
                 this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(22.0D);
                 this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.6D);
+                if (this.getHealth() >= 20){
+                	//TODO Create a better system to make sure young adults' health aren't reduced by loads from 22 to 20
+            		this.setHealth(22);
+            	}
             }
             else if (this.isChild())
             {
@@ -257,7 +262,7 @@ public class IvVillager extends EntityVillager{
     }
 	public int getHireCost()
     {
-          return this.dataManager.get(Hire_Cost);
+          return (int)this.dataManager.get(Hire_Cost);
     }
 	protected void setHireCost(int num)
     {
@@ -333,7 +338,7 @@ public class IvVillager extends EntityVillager{
 	    {
 	        super.onLivingUpdate();
 	        this.ivVillagerAdultAge((Config.adult_days * 24000)/3);
-	        this.setMoreVillagerNbtStuff();
+	        //this.setMoreVillagerNbtStuff();
 	    }
 	@Override
 	protected void onGrowingAdult()
@@ -371,7 +376,7 @@ public class IvVillager extends EntityVillager{
         this.tasks.addTask(10, new EntityAIWatchClosest2(this, EntityPlayer.class, 3.0F, 1.0F));
         this.tasks.addTask(10, new EntityAIWatchClosest(this, EntityLiving.class, 8.0F));
     }
-	protected void setAdditionalAItasks()
+ 	protected void setAdditionalAItasks()
     {
         if (!this.areAdditionalTasksSet)
         {
@@ -631,17 +636,15 @@ public class IvVillager extends EntityVillager{
         else if (!this.getHired() && this.getProfessionForge() == PROFESSION_NITWIT && !this.isChild())
         {
         	if (!world.isRemote) {
-	            player.openGui(Iv.instance, GuiHandler.Villager_Hire, world, getEntityId(), 0, 0);
+        		player.openGui(Iv.instance, GuiHandler.Villager_Hire, world, getEntityId(), 0, 0);
         	}
-
         	return true;
         }
         else if (this.getHired() && this.getProfessionForge() == PROFESSION_NITWIT && !this.isChild())
         {
         	if (!world.isRemote) {
-	            player.openGui(Iv.instance, GuiHandler.Hauler, world, getEntityId(), 0, 0);
-        	}
-
+        		player.openGui(Iv.instance, GuiHandler.Hauler, world, getEntityId(), 0, 0);
+        		}
         	return true;
         }
         else if (!this.holdingSpawnEggOfClass(itemstack, this.getClass()) && this.isEntityAlive() && !this.isTrading() && !this.isChild())

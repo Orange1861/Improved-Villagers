@@ -16,14 +16,13 @@ public class GuiHandler implements IGuiHandler{
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		// x is used as the entity ID for entity-based GUIs
-
+		// x is used as the entity ID for entity-based GUIs, suggested by Choonster
 		if (ID == Villager_Hire){
 			return new ContainerIvVillagerHireNitwit((IvVillager) world.getEntityByID(x), player.inventory);
 		}
 		else if (ID == Hauler){
-			return new ContainerIvVillagerHauler((IvVillager) world.getEntityByID(x), player.inventory);
-		}
+			return new ContainerIvVillagerHauler((IvVillager) world.getEntityByID(x), player.inventory);		
+			}
 		else {
 			return null;
 		}
@@ -31,8 +30,7 @@ public class GuiHandler implements IGuiHandler{
 
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		// x is used as the entity ID for entity-based GUIs
-
+		// x is used as the entity ID for entity-based GUIs, suggested by Choonster
 		if (ID == Villager_Hire)
 		{
 			return new GuiIvVillagerHireNitwit((IvVillager) world.getEntityByID(x), player.inventory, player);

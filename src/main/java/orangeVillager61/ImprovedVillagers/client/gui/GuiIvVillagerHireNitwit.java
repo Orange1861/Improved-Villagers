@@ -58,7 +58,7 @@ public class GuiIvVillagerHireNitwit extends GuiContainer{
         {
         	has_emeralds = false;
         }
-        this.addButton(new Button_Hire(0, 115, 20, 40, 25, "Hire", this.villager, has_emeralds, this.player, i));
+        this.addButton(new Button_Hire(0, this.getGuiLeft() + 115, this.getGuiTop() + 20, 50, 25, "Hire", this.villager, has_emeralds, this.player, i));
     }
 
 }

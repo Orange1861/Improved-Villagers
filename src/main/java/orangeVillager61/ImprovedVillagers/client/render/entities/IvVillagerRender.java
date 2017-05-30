@@ -51,7 +51,7 @@ public class IvVillagerRender extends RenderLiving<IvVillager>
     protected ResourceLocation getEntityTexture(IvVillager entity)
     {
 	    if (entity.isChild() || entity.getAdultAge() == "Young Adult"){
-    		if (entity.getProfession() == 0)
+    		if (entity.getProfessionForge() == entity.PROFESSION_FARMER)
 	    	{
 	    		return FARMER_VILLAGER_YOUNG_TEXTURES;
 	    	}
@@ -71,7 +71,7 @@ public class IvVillagerRender extends RenderLiving<IvVillager>
 			{
 				return BUTCHER_VILLAGER_YOUNG_TEXTURES;
 			}
-		    else if (entity.getProfession() == 5)
+		    else if (entity.getProfessionForge() == entity.PROFESSION_NITWIT)
 			{
 				return VILLAGER_YOUNG_TEXTURES;
 			}
@@ -81,7 +81,7 @@ public class IvVillagerRender extends RenderLiving<IvVillager>
 		    }
     	}
     	else if (entity.getAdultAge() == "Middle Aged"){
-	    	if (entity.getProfession() == 0)
+	    	if (entity.getProfessionForge() == entity.PROFESSION_FARMER)
 	        	{
 	        		return FARMER_VILLAGER_TEXTURES;
 	        	}
@@ -101,7 +101,7 @@ public class IvVillagerRender extends RenderLiving<IvVillager>
 	    	{
 	    		return BUTCHER_VILLAGER_TEXTURES;
 	    	}
-	        else if (entity.getProfession() == 5)
+		    else if (entity.getProfessionForge() == entity.PROFESSION_NITWIT)
 	    	{
 	    		return VILLAGER_TEXTURES;
 	    	}
@@ -111,7 +111,7 @@ public class IvVillagerRender extends RenderLiving<IvVillager>
 	        }
     	}
     	else if (entity.getAdultAge() == "Elder"){
-    		if (entity.getProfession() == 0)
+    		if (entity.getProfessionForge() == entity.PROFESSION_FARMER)
         	{
         		return FARMER_VILLAGER_OLD_TEXTURES;
         	}
@@ -131,7 +131,7 @@ public class IvVillagerRender extends RenderLiving<IvVillager>
         	{
         		return BUTCHER_VILLAGER_OLD_TEXTURES;
         	}
-            else if (entity.getProfession() == 5)
+		    else if (entity.getProfessionForge() == entity.PROFESSION_NITWIT)
         	{
         		return VILLAGER_OLD_TEXTURES;
         	}
