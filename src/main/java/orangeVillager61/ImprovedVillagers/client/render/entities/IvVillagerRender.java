@@ -71,7 +71,7 @@ public class IvVillagerRender extends RenderLiving<IvVillager>
 			{
 				return BUTCHER_VILLAGER_YOUNG_TEXTURES;
 			}
-		    else if (entity.getProfessionForge() == entity.PROFESSION_NITWIT)
+		    else if (entity.getProfessionForge() == entity.PROFESSION_NITWIT  || entity.getProfession() == 5)
 			{
 				return VILLAGER_YOUNG_TEXTURES;
 			}
@@ -101,7 +101,7 @@ public class IvVillagerRender extends RenderLiving<IvVillager>
 	    	{
 	    		return BUTCHER_VILLAGER_TEXTURES;
 	    	}
-		    else if (entity.getProfessionForge() == entity.PROFESSION_NITWIT)
+		    else if (entity.getProfessionForge() == entity.PROFESSION_NITWIT  || entity.getProfession() == 5)
 	    	{
 	    		return VILLAGER_TEXTURES;
 	    	}
@@ -131,7 +131,7 @@ public class IvVillagerRender extends RenderLiving<IvVillager>
         	{
         		return BUTCHER_VILLAGER_OLD_TEXTURES;
         	}
-		    else if (entity.getProfessionForge() == entity.PROFESSION_NITWIT)
+		    else if (entity.getProfessionForge() == entity.PROFESSION_NITWIT || entity.getProfession() == 5)
         	{
         		return VILLAGER_OLD_TEXTURES;
         	}

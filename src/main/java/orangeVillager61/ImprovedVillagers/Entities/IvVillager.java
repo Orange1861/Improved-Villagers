@@ -50,14 +50,18 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.server.management.PreYggdrasilConverter;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.village.Village;
 import net.minecraft.world.World;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.fml.common.registry.GameRegistry.ObjectHolder;
 import net.minecraftforge.fml.common.registry.VillagerRegistry.VillagerProfession;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 import orangeVillager61.ImprovedVillagers.Config;
 import orangeVillager61.ImprovedVillagers.Iv;
 import orangeVillager61.ImprovedVillagers.Reference;
@@ -81,6 +85,7 @@ public class IvVillager extends EntityVillager{
 	public String name;
 	public int gender;
     protected boolean isWillingToMate;
+    private ItemStackHandler item_handler;
     protected int wealth;
     //public String Adult_Age;
     //protected int int_Age;
@@ -131,7 +136,30 @@ public class IvVillager extends EntityVillager{
     {
         return this.villagerInventory;
     }
-	
+	@Override
+	public boolean hasCapability(net.minecraftforge.common.capabilities.Capability<?> capability, @Nullable net.minecraft.util.EnumFacing facing)	{
+		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+		{
+			return true;
+		}
+		else
+		{
+			return super.hasCapability(capability, facing);
+		}
+	}
+    @Override
+    @Nullable
+    public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
+    {
+		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this.item_handler))
+		{
+			return (T) this.item_handler;
+		}
+		else
+		{
+			return super.getCapability(capability, facing);
+		}
+    }
 	@Override
 	protected void applyEntityAttributes()
     {
@@ -318,6 +346,7 @@ public class IvVillager extends EntityVillager{
         	else{
         		this.setAdultAge("Middle Aged");
         	}
+        	this.setMoreVillagerNbtStuff();
         }
         else{
         	this.setAdultAge("Child");
