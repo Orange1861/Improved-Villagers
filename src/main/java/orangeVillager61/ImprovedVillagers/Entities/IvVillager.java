@@ -620,16 +620,22 @@ public class IvVillager extends EntityVillager{
         	this.addNoteList(player.getUniqueID());
         	return true;
         }
-        else if (this.getHired() == false && this.getProfession() == 5 && !world.isRemote && !this.isChild())
+        else if (this.getHired() == false && this.getProfession() == 5 && !this.isChild())
         {
-    		BlockPos blockpos = new BlockPos(this);
-        	player.openGui(Iv.instance, GuiHandler.Villager_Hire, world, blockpos.getX(), blockpos.getY(), blockpos.getZ());
+        	if (!world.isRemote) {
+	            BlockPos blockpos = new BlockPos(this);
+	            player.openGui(Iv.instance, GuiHandler.Villager_Hire, world, blockpos.getX(), blockpos.getY(), blockpos.getZ());
+        	}
+
         	return true;
         }
-        else if (this.getHired() == true && this.getProfession() == 5 && !world.isRemote && !this.isChild())
+        else if (this.getHired() == true && this.getProfession() == 5 && !this.isChild())
         {
-			BlockPos blockpos = new BlockPos(this);
-        	player.openGui(Iv.instance, GuiHandler.Hauler, world, blockpos.getX(), blockpos.getY(), blockpos.getZ());
+        	if (!world.isRemote) {
+	            BlockPos blockpos = new BlockPos(this);
+	            player.openGui(Iv.instance, GuiHandler.Hauler, world, blockpos.getX(), blockpos.getY(), blockpos.getZ());
+        	}
+
         	return true;
         }
         else if (!this.holdingSpawnEggOfClass(itemstack, this.getClass()) && this.isEntityAlive() && !this.isTrading() && !this.isChild())
