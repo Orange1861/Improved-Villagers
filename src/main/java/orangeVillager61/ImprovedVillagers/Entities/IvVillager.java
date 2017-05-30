@@ -628,7 +628,7 @@ public class IvVillager extends EntityVillager{
         	this.addNoteList(player.getUniqueID());
         	return true;
         }
-        else if (this.getHired() == false && this.getProfessionForge() == PROFESSION_NITWIT && !this.isChild())
+        else if (!this.getHired() && this.getProfessionForge() == PROFESSION_NITWIT && !this.isChild())
         {
         	if (!world.isRemote) {
 	            BlockPos blockpos = new BlockPos(this);
@@ -637,7 +637,7 @@ public class IvVillager extends EntityVillager{
 
         	return true;
         }
-        else if (this.getHired() == true && this.getProfessionForge() == PROFESSION_NITWIT && !this.isChild())
+        else if (this.getHired() && this.getProfessionForge() == PROFESSION_NITWIT && !this.isChild())
         {
         	if (!world.isRemote) {
 	            BlockPos blockpos = new BlockPos(this);
