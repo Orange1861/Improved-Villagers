@@ -16,13 +16,13 @@ public class GuiHandler implements IGuiHandler{
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		BlockPos pos = new BlockPos(x, y, z);
-		AxisAlignedBB vilSearch = new AxisAlignedBB(pos);
+		// x is used as the entity ID for entity-based GUIs
+
 		if (ID == Villager_Hire){
-			return new ContainerIvVillagerHireNitwit(world.getEntitiesWithinAABB(IvVillager.class, vilSearch).get(0), player.inventory);
+			return new ContainerIvVillagerHireNitwit((IvVillager) world.getEntityByID(x), player.inventory);
 		}
 		else if (ID == Hauler){
-			return new ContainerIvVillagerHauler(world.getEntitiesWithinAABB(IvVillager.class, vilSearch).get(0), player.inventory);
+			return new ContainerIvVillagerHauler((IvVillager) world.getEntityByID(x), player.inventory);
 		}
 		else {
 			return null;
@@ -31,14 +31,14 @@ public class GuiHandler implements IGuiHandler{
 
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		BlockPos pos = new BlockPos(x, y, z);
-		AxisAlignedBB vilSearch = new AxisAlignedBB(pos);
+		// x is used as the entity ID for entity-based GUIs
+
 		if (ID == Villager_Hire)
 		{
-			return new GuiIvVillagerHireNitwit(world.getEntitiesWithinAABB(IvVillager.class, vilSearch).get(0), player.inventory, player);
+			return new GuiIvVillagerHireNitwit((IvVillager) world.getEntityByID(x), player.inventory, player);
 		}
 		else if (ID == Hauler){
-			return new ContainerIvVillagerHauler(world.getEntitiesWithinAABB(IvVillager.class, vilSearch).get(0), player.inventory);
+			return new ContainerIvVillagerHauler((IvVillager) world.getEntityByID(x), player.inventory);
 		}
 		else {
 			return null;

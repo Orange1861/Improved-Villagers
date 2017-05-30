@@ -631,8 +631,7 @@ public class IvVillager extends EntityVillager{
         else if (!this.getHired() && this.getProfessionForge() == PROFESSION_NITWIT && !this.isChild())
         {
         	if (!world.isRemote) {
-	            BlockPos blockpos = new BlockPos(this);
-	            player.openGui(Iv.instance, GuiHandler.Villager_Hire, world, blockpos.getX(), blockpos.getY(), blockpos.getZ());
+	            player.openGui(Iv.instance, GuiHandler.Villager_Hire, world, getEntityId(), 0, 0);
         	}
 
         	return true;
@@ -640,8 +639,7 @@ public class IvVillager extends EntityVillager{
         else if (this.getHired() && this.getProfessionForge() == PROFESSION_NITWIT && !this.isChild())
         {
         	if (!world.isRemote) {
-	            BlockPos blockpos = new BlockPos(this);
-	            player.openGui(Iv.instance, GuiHandler.Hauler, world, blockpos.getX(), blockpos.getY(), blockpos.getZ());
+	            player.openGui(Iv.instance, GuiHandler.Hauler, world, getEntityId(), 0, 0);
         	}
 
         	return true;
