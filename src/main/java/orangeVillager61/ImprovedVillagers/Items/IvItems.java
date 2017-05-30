@@ -26,7 +26,7 @@ public class IvItems {
 		raw_villager = new BasicFood("raw_villager", 5, 0.5F, true, new PotionEffect(MobEffects.HUNGER, 80, 0));
 		cooked_villager = new BasicFood("cooked_villager", 9, 1.1F, true);
 		thieving_nose = new ThievingNose("thieving_nose", 16);
-		notification_marker = new BasicItem("notification_marker", 1);
+		notification_marker = new BasicItem("notification_marker", 1, 120);
 	}
 	
 	public static void createItems()

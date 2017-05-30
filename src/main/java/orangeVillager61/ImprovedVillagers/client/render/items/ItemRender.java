@@ -18,6 +18,7 @@ public static String modid = Reference.MOD_ID;
 		reg(IvItems.thieving_nose);
 		reg(IvItems.raw_villager);
 		reg(IvItems.cooked_villager);
+		reg(IvItems.notification_marker);
 	}
 
 	public static void reg(Item item) {

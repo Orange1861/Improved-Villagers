@@ -70,6 +70,7 @@ import orangeVillager61.ImprovedVillagers.client.gui.GuiHandler;
 
 public class IvVillager extends EntityVillager{
 	
+	//TODO Convert the rest of this Villager from vanilla ints to forge profession
 	@ObjectHolder("minecraft:farmer")
 	public static VillagerProfession PROFESSION_FARMER = null;
 
@@ -182,9 +183,21 @@ public class IvVillager extends EntityVillager{
     }
 	public void addNoteList(UUID player_to_add)
 	{
+		int array_size;
 		if (!this.note_list.contains(player_to_add))
 		{
 			this.note_list.add(player_to_add);
+			//TODO Add a confirmation that this worked
+		}
+	}
+	public void addNoteList(UUID player_to_add, ItemStack itemstack, EntityPlayer player)
+	{
+		int array_size;
+		if (!this.note_list.contains(player_to_add))
+		{
+			this.note_list.add(player_to_add);
+        	itemstack.damageItem(1, player);
+			//TODO Add a confirmation that this worked
 		}
 	}
 	public ArrayList<UUID> getNoteList()
@@ -324,6 +337,7 @@ public class IvVillager extends EntityVillager{
         			}
         			else if (this.getAdultAge().equals("Elder")){
         				this.setIntAge(this.getIntAge() - 500);
+        				//TODO This should kill Elders for every time this is called, planned for beta 4 or 5
         			}
         		}
         		else{
@@ -630,7 +644,8 @@ public class IvVillager extends EntityVillager{
         }
         else if (itemstack.getItem() == IvItems.notification_marker)
         {
-        	this.addNoteList(player.getUniqueID());
+        	this.addNoteList(player.getUniqueID(), itemstack, player);
+        	itemstack.damageItem(1, player);
         	return true;
         }
         else if (!this.getHired() && this.getProfessionForge() == PROFESSION_NITWIT && !this.isChild())
