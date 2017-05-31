@@ -52,11 +52,15 @@ public class IvVilsPerDoor extends EntityAIBase
             }
             else if (this.checkSufficientDoorsPresentForNewVillager() && this.villagerObj.getIsWillingToMate(true))
             {
-                Entity entity = this.world.findNearestEntityWithinAABB(IvVillager.class, this.villagerObj.getEntityBoundingBox().expand(8.0D, 3.0D, 8.0D), this.villagerObj);
+                IvVillager entity = this.world.findNearestEntityWithinAABB(IvVillager.class, this.villagerObj.getEntityBoundingBox().expand(8.0D, 3.0D, 8.0D), this.villagerObj);
 
                 if (entity == null)
                 {
                     return false;
+                }
+                else if (entity.getGender() == this.villagerObj.getGender())
+                {
+                	return false;
                 }
                 else
                 {

@@ -83,7 +83,7 @@ public class IvVillager extends EntityVillager{
 	
 	protected Village villageObj; 
 	public String name;
-	public int gender;
+	//public int gender;
     protected boolean isWillingToMate;
     private ItemStackHandler item_handler;
     protected int wealth;
@@ -91,11 +91,13 @@ public class IvVillager extends EntityVillager{
     //protected int int_Age;
     protected MerchantRecipeList buyingList;
     protected static final DataParameter<Optional<UUID>> OWNER_DEFINED_ID = EntityDataManager.<Optional<UUID>>createKey(IvVillager.class, DataSerializers.OPTIONAL_UNIQUE_ID);
+    //TODO Turn Adult Age into an Enum
     private static final DataParameter<String> Adult_Age = EntityDataManager.<String>createKey(IvVillager.class, DataSerializers.STRING);
     private static final DataParameter<Integer> int_Age = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
     private static final DataParameter<Boolean> Is_Hired = EntityDataManager.<Boolean>createKey(IvVillager.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Integer> Hire_Cost = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
     private static final DataParameter<Boolean> Following = EntityDataManager.<Boolean>createKey(IvVillager.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Integer> Gender = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
     private int careerId;
     private int careerLevel;
     private boolean isLookingForHome;
@@ -121,12 +123,13 @@ public class IvVillager extends EntityVillager{
 		super(world);
         this.villagerInventory = new InventoryBasic("Items", false, 20);
         this.setVillagerAge();
+        this.setHireCost(r.nextInt(21) + 20);
 	}
 	public IvVillager(World world, int professionId, int gender, String name) {
 		super(world, professionId);
 	    this.setProfession(professionId);
         this.villagerInventory = new InventoryBasic("Items", false, 20);
-        this.gender = gender;
+        this.setGender(gender);
         this.name = name;
         this.setCustomNameTag(name);
         this.setVillagerAge();
@@ -151,9 +154,9 @@ public class IvVillager extends EntityVillager{
     @Nullable
     public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
     {
-		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this.item_handler))
+		if (capability == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
 		{
-			return (T) this.item_handler;
+			return CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.cast(this.item_handler);
 		}
 		else
 		{
@@ -286,6 +289,7 @@ public class IvVillager extends EntityVillager{
 	protected void entityInit()
     {
 		super.entityInit();
+		this.getDataManager().register(Gender, Integer.valueOf(0));
 		this.getDataManager().register(int_Age, Integer.valueOf(1));
 		this.getDataManager().register(Adult_Age, String.valueOf(""));
 		this.getDataManager().register(Is_Hired, Boolean.valueOf(false));
@@ -320,6 +324,14 @@ public class IvVillager extends EntityVillager{
 	public boolean getHired()
     {
           return (boolean)this.dataManager.get(Is_Hired);
+    }
+	protected void setGender(int num)
+    {
+        this.dataManager.set(Gender, num);
+    }
+	public int getGender()
+    {
+          return (Integer)this.dataManager.get(Gender);
     }
 	public void setFollowing(boolean bool)
     {
@@ -447,6 +459,7 @@ public class IvVillager extends EntityVillager{
 		        compound.setInteger("Profession", this.getProfession());
 		        compound.setString("ProfessionName", this.getProfessionForge().getRegistryName().toString());
 		        compound.setInteger("Riches", this.wealth);
+	        	compound.setInteger("Gender", this.getGender());
 		        compound.setInteger("Int_Age", this.getIntAge());
 		        compound.setInteger("Hire_Cost", this.getHireCost());
 		        compound.setBoolean("Is_Hired", this.getHired());
@@ -490,15 +503,15 @@ public class IvVillager extends EntityVillager{
 
 	        compound.setTag("Inventory", nbttaglist);
 	        if (world.isRemote == false){
-	        	if (this.gender != 1 || this.gender != 2){
-	        		this.gender = r.nextInt(2) + 1;
+	        	if (this.getGender() != 1 || this.getGender() != 2){
+	        		this.setGender(r.nextInt(2) + 1);
 	        	}
-	        	compound.setInteger("Gender", this.gender);
+	        	compound.setInteger("Gender", this.getGender());
 	        	if (this.getCustomNameTag() == null || this.getCustomNameTag() == "None" || this.getCustomNameTag() == "none"){
-	        		if (this.gender == 1){
+	        		if (this.getGender() == 1){
 	        			this.name = male_list[r.nextInt(male_list.length)];
 	        		}
-	        		else if (this.gender == 2){
+	        		else if (this.getGender() == 2){
 	        			this.name = female_list[r.nextInt(female_list.length)]; 
 	        		}
 	        		else{
@@ -527,7 +540,10 @@ public class IvVillager extends EntityVillager{
 		 super.readEntityFromNBT(compound);
 	     String s;
 		 if (world.isRemote == false){
-			 this.gender = compound.getInteger("Gender");
+			 if (compound.hasKey("Gender"))
+			 {
+				 this.setGender(compound.getInteger("Gender"));
+			 }
 			 this.name = compound.getString("Name");
 			 //this.setCustomNameTag(this.name);
 		 }
