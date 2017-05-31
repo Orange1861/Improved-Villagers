@@ -85,7 +85,7 @@ public class IvVillager extends EntityVillager{
 	public String name;
 	//public int gender;
     protected boolean isWillingToMate;
-    private ItemStackHandler item_handler;
+    private ItemStackHandler item_handler  = new ItemStackHandler();
     protected int wealth;
     //public String Adult_Age;
     //protected int int_Age;
