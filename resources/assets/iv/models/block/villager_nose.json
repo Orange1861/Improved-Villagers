@@ -1,0 +1,24 @@
+{
+    "__comment": "Model generated using MrCrayfish's Model Creator (http://mrcrayfish.com/modelcreator/)",
+    "textures": {
+        "particle": "iv:blocks/villager_nose1",
+        "0": "iv:blocks/villager_nose1",        
+	"1": "iv:blocks/villager_nose2"
+
+    },
+    "elements": [
+        {
+            "name": "Cube",
+            "from": [ 7.0, 0.0, 7.0 ], 
+            "to": [ 9.0, 4.0, 9.0 ], 
+            "faces": {
+                "north": { "texture": "#0", "uv": [ 0.0, 0.0, 2.0, 4.0 ] },
+                "east": { "texture": "#1", "uv": [ 0.0, 0.0, 2.0, 4.0 ] },
+                "south": { "texture": "#0", "uv": [ 0.0, 0.0, 2.0, 4.0 ] },
+                "west": { "texture": "#1", "uv": [ 2.0, 0.0, 4.0, 4.0 ] },
+                "up": { "texture": "#1", "uv": [ 0.0, 4.0, 2.0, 6.0 ] },
+                "down": { "texture": "#0", "uv": [ 0.0, 0.0, 2.0, 2.0 ] }
+            }
+        }
+    ]
+}

@@ -1,0 +1,13 @@
+//Items
+item.raw_villager.name=Raw Villager
+item.cooked_villager.name=Cooked Villager
+item.thieving_nose.name=Thieving Nose
+item.notification_marker.name=Notification Marker
+
+//Blocks
+tile.villager_nose.name=Villager Nose
+tile.clay1_door.name=Clay Door
+tile.light_blue_stairs.name=Light Blue Hardened Clay Stairs
+
+//Creative Tabs
+itemGroup.tabIv=Improved Villagers
