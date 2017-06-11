@@ -23,10 +23,6 @@ public class Button_Follow extends GuiButton{
 		Point b = a.getLocation();
 		int mouseX = (int) b.getX();
 		int mouseY = (int) b.getY();
-		if (this.mousePressed(mouseX, mouseY))
-		{
-			
-		}
 	}
 	public boolean mousePressed(int mouseX, int mouseY)
     {
