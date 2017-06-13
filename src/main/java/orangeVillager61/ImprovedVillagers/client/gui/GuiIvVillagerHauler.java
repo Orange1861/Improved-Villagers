@@ -28,6 +28,11 @@ public class GuiIvVillagerHauler extends GuiContainer{
 		
 		this.villager = villager;
 		this.playerInv = playerInv;
+	}
+	@Override
+	public void initGui()
+	{
+		super.initGui();
 		 if (this.villager.getFollowing()){
 				this.button_text = "Following";
 			}
@@ -35,10 +40,8 @@ public class GuiIvVillagerHauler extends GuiContainer{
 			{
 				this.button_text = "Follow";
 			}
-        this.addButton(new GuiButton(0, 115, 20, 40, 20, this.button_text));
-
+        this.addButton(new GuiButton(0, this.getGuiLeft() + 126, this.getGuiTop() + 20, 50, 20, this.button_text));
 	}
-
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);

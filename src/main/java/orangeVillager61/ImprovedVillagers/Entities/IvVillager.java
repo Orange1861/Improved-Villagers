@@ -135,6 +135,7 @@ public class IvVillager extends EntityVillager{
         this.name = name;
         this.setCustomNameTag(name);
         this.setVillagerAge();
+	    this.setHireCost(r.nextInt(21) + 20);
 	}
 	public InventoryBasic getVillagerInventory()
     {
@@ -447,7 +448,7 @@ public class IvVillager extends EntityVillager{
             }
             if (this.getHired())
             {
-                this.tasks.addTask(6, new VillagerFollowOwner(this, 1.0D, 10.0F, 2.0F));
+                this.tasks.addTask(6, new VillagerFollowOwner(this, 0.9D, 16.0F, 2.0F));
             }
         }
     }
@@ -456,10 +457,6 @@ public class IvVillager extends EntityVillager{
 	    {
 	        super.writeEntityToNBT(compound);
 	        if (world.isRemote == false){
-	        	if (this.getHireCost() == 0)
-	        	{
-	        		this.setHireCost(r.nextInt(21) + 20);
-	        	}
 		        compound.setInteger("Profession", this.getProfession());
 		        compound.setString("ProfessionName", this.getProfessionForge().getRegistryName().toString());
 		        compound.setInteger("Riches", this.wealth);
@@ -540,6 +537,8 @@ public class IvVillager extends EntityVillager{
 			 this.setHired(true);
 	         this.setOwnerId(player.getUniqueID());
 	         item_handler.setStackInSlot(0, new ItemStack(Items.EMERALD, remaining_i));
+             this.tasks.addTask(6, new VillagerFollowOwner(this, 0.9D, 16.0F, 2.0F));
+             this.setFollowing(true);
      		 player.openGui(Iv.instance, GuiHandler.Hauler, this.world, getEntityId(), 0, 0);
 		 }
 		 else if (this.getHired())
@@ -602,10 +601,10 @@ public class IvVillager extends EntityVillager{
 			 this.setIntAge(compound.getInteger("Int_Age"));
 		 }
 		 if (compound.hasKey("Hire_Cost")){
-			 this.setIntAge(compound.getInteger("Hire_Cost"));
+			 this.setHireCost(compound.getInteger("Hire_Cost"));
 		 }
-		 else{
-		     this.setHireCost(r.nextInt(21) + 20);
+		 else {
+			    this.setHireCost(r.nextInt(21) + 20);
 		 }
 		 if (compound.hasKey("OwnerUUID", 8))
 	        {
