@@ -36,7 +36,7 @@ public class GuiHandler implements IGuiHandler{
 			return new GuiIvVillagerHireNitwit((IvVillager) world.getEntityByID(x), player.inventory, player);
 		}
 		else if (ID == Hauler){
-			return new ContainerIvVillagerHauler((IvVillager) world.getEntityByID(x), player.inventory);
+			return new GuiIvVillagerHauler((IvVillager) world.getEntityByID(x), player.inventory);
 		}
 		else {
 			return null;

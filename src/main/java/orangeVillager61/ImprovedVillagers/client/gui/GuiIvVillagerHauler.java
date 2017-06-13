@@ -9,9 +9,10 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
 import orangeVillager61.ImprovedVillagers.Reference;
+import orangeVillager61.ImprovedVillagers.Container.ContainerIvVillagerHauler;
 import orangeVillager61.ImprovedVillagers.Container.ContainerIvVillagerHireNitwit;
 import orangeVillager61.ImprovedVillagers.Entities.IvVillager;
-import orangeVillager61.ImprovedVillagers.Packet.MessageSendEntityId;
+import orangeVillager61.ImprovedVillagers.Packet.MessageChangeFollow;
 
 public class GuiIvVillagerHauler extends GuiContainer{
 
@@ -20,7 +21,7 @@ public class GuiIvVillagerHauler extends GuiContainer{
 	private String button_text;
 	
 	public GuiIvVillagerHauler(IvVillager villager, IInventory playerInv) {
-		super(new ContainerIvVillagerHireNitwit(villager, playerInv));
+		super(new ContainerIvVillagerHauler(villager, playerInv));
 		
 		this.xSize = 176;
 		this.ySize = 166;
@@ -34,7 +35,7 @@ public class GuiIvVillagerHauler extends GuiContainer{
 			{
 				this.button_text = "Follow";
 			}
-        this.addButton(new Button_Follow(0, 115, 20, 40, 25, this.villager, this.button_text));
+        this.addButton(new GuiButton(0, 115, 20, 40, 20, this.button_text));
 
 	}
 
@@ -48,8 +49,8 @@ public class GuiIvVillagerHauler extends GuiContainer{
     protected void actionPerformed(GuiButton button)
     {
 		if (this.villager.getHired())
-		{
-	    	Reference.PACKET_MODID.sendToServer(new MessageSendEntityId(this.villager.getEntityId()));
+		{ 
+	    	Reference.PACKET_MODID.sendToServer(new MessageChangeFollow(this.villager.getEntityId()));
 		}
     }
 	@Override

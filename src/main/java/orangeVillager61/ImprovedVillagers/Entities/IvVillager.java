@@ -86,7 +86,7 @@ public class IvVillager extends EntityVillager{
 	public String name;
 	//public int gender;
     protected boolean isWillingToMate;
-    private ItemStackHandler item_handler = new ItemStackHandler();
+    private ItemStackHandler item_handler = new ItemStackHandler(15);
     protected int wealth;
     //public String Adult_Age;
     //protected int int_Age;
@@ -126,7 +126,6 @@ public class IvVillager extends EntityVillager{
 		super(world);
         this.villagerInventory = new InventoryBasic("Items", false, 20);
         this.setVillagerAge();
-        this.setHireCost(r.nextInt(21) + 20);
 	}
 	public IvVillager(World world, int professionId, int gender, String name) {
 		super(world, professionId);
@@ -136,7 +135,6 @@ public class IvVillager extends EntityVillager{
         this.name = name;
         this.setCustomNameTag(name);
         this.setVillagerAge();
-        this.setHireCost(r.nextInt(21) + 20);
 	}
 	public InventoryBasic getVillagerInventory()
     {
@@ -211,11 +209,6 @@ public class IvVillager extends EntityVillager{
                 this.getEntityAttribute(SharedMonsterAttributes.MOVEMENT_SPEED).setBaseValue(0.55D);
                 this.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).setBaseValue(20.0D);
                 this.setSize(0.6F, 1.95F);
-            }
-
-            if (this.getHired())
-            {
-                this.tasks.addTask(6, new VillagerFollowOwner(this, 1.0D, 10.0F, 2.0F));
             }
         }
     }
@@ -438,7 +431,7 @@ public class IvVillager extends EntityVillager{
         this.tasks.addTask(10, new EntityAIWatchClosest2(this, EntityPlayer.class, 3.0F, 1.0F));
         this.tasks.addTask(10, new EntityAIWatchClosest(this, EntityLiving.class, 8.0F));
     }
- 	protected void setAdditionalAItasks()
+	protected void setAdditionalAItasks()
     {
         if (!this.areAdditionalTasksSet)
         {
@@ -448,9 +441,13 @@ public class IvVillager extends EntityVillager{
             {
                 this.tasks.addTask(8, new EntityAIPlay(this, 0.32D));
             }
-            else if (this.getProfessionForge() == PROFESSION_FARMER)
+            else if (this.getProfessionForge() == PROFESSION_FARMER || this.getProfession() == 0)
             {
                 this.tasks.addTask(6, new EntityAIHarvestFarmland(this, 0.6D));
+            }
+            if (this.getHired())
+            {
+                this.tasks.addTask(6, new VillagerFollowOwner(this, 1.0D, 10.0F, 2.0F));
             }
         }
     }
@@ -606,6 +603,9 @@ public class IvVillager extends EntityVillager{
 		 }
 		 if (compound.hasKey("Hire_Cost")){
 			 this.setIntAge(compound.getInteger("Hire_Cost"));
+		 }
+		 else{
+		     this.setHireCost(r.nextInt(21) + 20);
 		 }
 		 if (compound.hasKey("OwnerUUID", 8))
 	        {
