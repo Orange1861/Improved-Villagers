@@ -294,7 +294,7 @@ public class IvVillager extends EntityVillager{
 		this.getDataManager().register(int_Age, Integer.valueOf(1));
 		this.getDataManager().register(Adult_Age, String.valueOf(""));
 		this.getDataManager().register(Is_Hired, Boolean.valueOf(false));
-		this.getDataManager().register(Following, Boolean.valueOf(false));
+		this.getDataManager().register(Following, Boolean.valueOf(true));
 		this.getDataManager().register(Hire_Cost, Integer.valueOf(0));
         this.getDataManager().register(OWNER_DEFINED_ID, Optional.<UUID>absent());
     }
@@ -448,7 +448,7 @@ public class IvVillager extends EntityVillager{
             }
             if (this.getHired())
             {
-                this.tasks.addTask(6, new VillagerFollowOwner(this, 0.9D, 16.0F, 2.0F));
+                this.tasks.addTask(2, new VillagerFollowOwner(this, 0.9D, 16.0F, 2.0F));
             }
         }
     }
@@ -537,8 +537,7 @@ public class IvVillager extends EntityVillager{
 			 this.setHired(true);
 	         this.setOwnerId(player.getUniqueID());
 	         item_handler.setStackInSlot(0, new ItemStack(Items.EMERALD, remaining_i));
-             this.tasks.addTask(6, new VillagerFollowOwner(this, 0.9D, 16.0F, 2.0F));
-             this.setFollowing(true);
+             this.tasks.addTask(2, new VillagerFollowOwner(this, 0.9D, 16.0F, 2.0F));
      		 player.openGui(Iv.instance, GuiHandler.Hauler, this.world, getEntityId(), 0, 0);
 		 }
 		 else if (this.getHired())

@@ -40,7 +40,7 @@ public class GuiIvVillagerHauler extends GuiContainer{
 			{
 				this.button_text = "Follow";
 			}
-        this.addButton(new GuiButton(0, this.getGuiLeft() + 126, this.getGuiTop() + 20, 50, 20, this.button_text));
+        this.addButton(new GuiButton(0, this.getGuiLeft() + 118, this.getGuiTop() + 20, 50, 20, this.button_text));
 	}
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
