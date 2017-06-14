@@ -278,7 +278,6 @@ public class IvVillager extends EntityVillager{
     @Nullable
     public UUID getOwnerId()
     {
-    	System.out.println((UUID)((Optional)this.dataManager.get(OWNER_DEFINED_ID)).orNull());
         return (UUID)((Optional)this.dataManager.get(OWNER_DEFINED_ID)).orNull();
     }
 
@@ -448,7 +447,7 @@ public class IvVillager extends EntityVillager{
             }
             if (this.getHired())
             {
-                this.tasks.addTask(2, new VillagerFollowOwner(this, 0.9D, 16.0F, 2.0F));
+                this.tasks.addTask(6, new VillagerFollowOwner(this, 0.9D, 10.0F, 2.0F));
             }
         }
     }
@@ -456,7 +455,7 @@ public class IvVillager extends EntityVillager{
 	 public void writeEntityToNBT(NBTTagCompound compound)
 	    {
 	        super.writeEntityToNBT(compound);
-	        if (world.isRemote == false){
+	        //if (world.isRemote == false){
 		        compound.setInteger("Profession", this.getProfession());
 		        compound.setString("ProfessionName", this.getProfessionForge().getRegistryName().toString());
 		        compound.setInteger("Riches", this.wealth);
@@ -467,7 +466,7 @@ public class IvVillager extends EntityVillager{
 		        compound.setInteger("Career", this.careerId);
 		        compound.setInteger("CareerLevel", this.careerLevel);
 		        compound.setBoolean("Willing", this.isWillingToMate);
-		        
+		        compound.setTag("Villager_Inv", this.item_handler.serializeNBT());
 		        for (int b = 0; b < this.getNoteList().size(); b++)
 		        {
 		        	compound.setUniqueId("UUID Note " + Integer.toString(b), this.getNoteList().get(b));
@@ -489,7 +488,7 @@ public class IvVillager extends EntityVillager{
 		        {
 		            compound.setTag("Offers", this.buyingList.getRecipiesAsTags());
 		        }
-	        }
+	        //}
 	        NBTTagList nbttaglist = new NBTTagList();
 
 	        for (int i = 0; i < this.getVillagerInventory().getSizeInventory(); ++i)
@@ -503,27 +502,6 @@ public class IvVillager extends EntityVillager{
 	        }
 
 	        compound.setTag("Inventory", nbttaglist);
-	        if (world.isRemote == false){
-	        	if (this.getGender() != 1 || this.getGender() != 2){
-	        		this.setGender(r.nextInt(2) + 1);
-	        	}
-	        	compound.setInteger("Gender", this.getGender());
-	        	if (this.getCustomNameTag() == null || this.getCustomNameTag() == "None" || this.getCustomNameTag() == "none"){
-	        		if (this.getGender() == 1){
-	        			this.name = male_list[r.nextInt(male_list.length)];
-	        		}
-	        		else if (this.getGender() == 2){
-	        			this.name = female_list[r.nextInt(female_list.length)]; 
-	        		}
-	        		else{
-	        			this.name = "None";
-	        			System.out.println("Something went wrong with gender, please report.");
-	        			System.out.println("No Name");
-	        		}
-		        	compound.setString("Name", this.name);
-		        	this.setCustomNameTag(this.name);
-	        	}
-	        }
 	        
 	    }
 	 
@@ -537,7 +515,7 @@ public class IvVillager extends EntityVillager{
 			 this.setHired(true);
 	         this.setOwnerId(player.getUniqueID());
 	         item_handler.setStackInSlot(0, new ItemStack(Items.EMERALD, remaining_i));
-             this.tasks.addTask(2, new VillagerFollowOwner(this, 0.9D, 16.0F, 2.0F));
+             this.tasks.addTask(6, new VillagerFollowOwner(this, 0.9D, 10.0F, 2.0F));
      		 player.openGui(Iv.instance, GuiHandler.Hauler, this.world, getEntityId(), 0, 0);
 		 }
 		 else if (this.getHired())
@@ -580,6 +558,7 @@ public class IvVillager extends EntityVillager{
 			 }
 			 this.name = compound.getString("Name");
 		 }
+		 this.item_handler.deserializeNBT(compound.getCompoundTag("Villager_Inv"));
 	     for (int b = 0; b < this.getNoteList().size(); b++)
 	     {
 	         this.addNoteList(compound.getUniqueId("UUID Note " + Integer.toString(b)));
@@ -663,7 +642,27 @@ public class IvVillager extends EntityVillager{
 	        this.setCanPickUpLoot(true);
 	        this.setAdditionalAItasks();
 	        this.setMoreVillagerNbtStuff();
-		 
+	        if (world.isRemote == false){
+	        	if (this.getGender() != 1 || this.getGender() != 2){
+	        		this.setGender(r.nextInt(2) + 1);
+	        	}
+	        	compound.setInteger("Gender", this.getGender());
+	        	if (this.getCustomNameTag() == null || this.getCustomNameTag() == "None" || this.getCustomNameTag() == "none"){
+	        		if (this.getGender() == 1){
+	        			this.name = male_list[r.nextInt(male_list.length)];
+	        		}
+	        		else if (this.getGender() == 2){
+	        			this.name = female_list[r.nextInt(female_list.length)]; 
+	        		}
+	        		else{
+	        			this.name = "None";
+	        			System.out.println("Something went wrong with gender, please report.");
+	        			System.out.println("No Name");
+	        		}
+		        	compound.setString("Name", this.name);
+		        	this.setCustomNameTag(this.name);
+	        	}
+	        }
 	 }
 	 protected void populateBuyingList()
 	    {

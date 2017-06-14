@@ -40,7 +40,7 @@ public class GuiIvVillagerHauler extends GuiContainer{
 			{
 				this.button_text = "Follow";
 			}
-        this.addButton(new GuiButton(0, this.getGuiLeft() + 118, this.getGuiTop() + 20, 50, 20, this.button_text));
+        this.addButton(new ButtonFollow(0, this.getGuiLeft() + 118, this.getGuiTop() + 20, 50, 20, this.button_text, this.villager));
 	}
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
@@ -54,6 +54,13 @@ public class GuiIvVillagerHauler extends GuiContainer{
 		if (this.villager.getHired())
 		{ 
 	    	Reference.PACKET_MODID.sendToServer(new MessageChangeFollow(this.villager.getEntityId()));
+		}
+		if (this.villager.getFollowing()){
+			this.button_text = "Following";
+		}
+		else 
+		{
+			this.button_text = "Follow";
 		}
     }
 	@Override
