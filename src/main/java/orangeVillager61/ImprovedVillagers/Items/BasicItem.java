@@ -14,7 +14,14 @@ public class BasicItem extends Item {
 	    setUnlocalizedName(name);
 	    //setRegistryName(Reference.MOD_ID + ":" + name);
 	}
-	
+	public BasicItem(String name, int maxstacksize, int maxDamage){
+		super();
+	    this.setCreativeTab(Iv.tabIv);
+	    this.setMaxStackSize(maxstacksize);
+	    setUnlocalizedName(name);
+	    this.setMaxDamage(maxDamage);
+	    //setRegistryName(Reference.MOD_ID + ":" + name);
+	}
 	public BasicItem (String name) {
 		super();
 	    this.setCreativeTab(Iv.tabIv);

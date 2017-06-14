@@ -23,11 +23,16 @@ public class IvRecipes {
 	     NBTTagCompound nbttagcompound1 = new NBTTagCompound();
 	     nbttagcompound1.setString("id", entityId);
 	     nbttagcompound.setTag("EntityTag", nbttagcompound1);
-	     stack.setTagCompound(nbttagcompound);
+	     stack.setTagCompound(nbttagcompound); 
 	 }
 	 
 	 public static void addRecipes() {
 		 GameRegistry.addShapelessRecipe(new ItemStack (IvItems.thieving_nose), Items.EMERALD, IvBlocks.villager_nose);
+		 GameRegistry.addShapelessRecipe(new ItemStack (IvItems.notification_marker), Items.EMERALD, new ItemStack (Items.IRON_INGOT, 2));
+		 GameRegistry.addRecipe(new ItemStack(IvItems.notification_marker), new Object[]
+	    		  {" E ", 
+	    		   " I ", 
+	    		   " I ", Character.valueOf('E'), Items.EMERALD, Character.valueOf('I'), Items.IRON_INGOT});
 		 GameRegistry.addRecipe(new ItemStack(IvBlocks.light_blue_stairs), new Object[]
 	    		  {"B  ", 
 	    		   "BB ", 
