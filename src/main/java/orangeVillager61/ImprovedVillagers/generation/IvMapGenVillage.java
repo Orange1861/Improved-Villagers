@@ -36,8 +36,8 @@ public class IvMapGenVillage extends MapGenVillage
     {
         this.distance = Config.VillageDistance;
         this.minTownSeparation = 4;
-        this.isMetropolis = false;
-        if (r.nextInt(20) + 1 == 2){
+        this.isMetropolis = true;
+        if (r.nextInt(20) + 1 == 2 && Config.enable_Metro){
         	this.isMetropolis = true;
         }
     }

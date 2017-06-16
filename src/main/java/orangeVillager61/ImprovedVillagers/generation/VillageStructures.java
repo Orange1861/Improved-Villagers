@@ -4,6 +4,8 @@ import com.google.common.collect.Lists;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
+
 import javax.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockCrops;
@@ -46,8 +48,10 @@ import net.minecraft.world.gen.structure.StructureVillagePieces;
 import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraft.world.storage.loot.LootTableList;
 import orangeVillager61.ImprovedVillagers.CommonProxy;
+import orangeVillager61.ImprovedVillagers.Config;
 import orangeVillager61.ImprovedVillagers.Reflector;
 import orangeVillager61.ImprovedVillagers.Blocks.IvBlocks;
+import orangeVillager61.ImprovedVillagers.Entities.IvVillager;
 
 public class VillageStructures
 {
@@ -392,8 +396,14 @@ public class VillageStructures
                         this.replaceAirAndLiquidDownwards(worldIn, iblockstate, j, -1, k, structureBoundingBoxIn);
                     }
                 }
-
-                this.spawnVillagers(worldIn, structureBoundingBoxIn, 2, 1, 2, 1, false);
+                if(Config.overwriteOriginalVillagers)
+                {
+                	this.spawnIvVillagers(worldIn, structureBoundingBoxIn, 2, 1, 2, 1, false, 2);
+                }
+                else
+                {
+                    this.spawnVillagers(worldIn, structureBoundingBoxIn, 2, 1, 2, 1, false);
+                }
                 return true;
             }
 
@@ -808,15 +818,22 @@ public class VillageStructures
                     }
                 }
 
-                this.spawnVillagers(worldIn, structureBoundingBoxIn, 4, 1, 2, 2, false);
+                if (Config.overwriteOriginalVillagers)
+                {
+                    this.spawnIvVillagers(worldIn, structureBoundingBoxIn, 4, 1, 2, 2, true, 4);
+                }
+                else
+                {
+                    this.spawnVillagers(worldIn, structureBoundingBoxIn, 4, 1, 2, 2, true);
+                }
                 this.spawnFarmAnimals(worldIn, structureBoundingBoxIn, 3, 1, 9, 4);
                 return true;
             }
-
             protected int chooseProfession(int villagersSpawnedIn, int currentVillagerProfession)
             {
                 return villagersSpawnedIn == 0 ? 4 : super.chooseProfession(villagersSpawnedIn, currentVillagerProfession);
             }
+            
         }
     
     public static class House1 extends VillageStructures.Village
@@ -947,8 +964,14 @@ public class VillageStructures
                         this.replaceAirAndLiquidDownwards(worldIn, iblockstate, k, -1, l, structureBoundingBoxIn);
                     }
                 }
-
-                this.spawnVillagers(worldIn, structureBoundingBoxIn, 2, 1, 2, 1, false);
+                if (Config.overwriteOriginalVillagers)
+                {
+                    this.spawnIvVillagers(worldIn, structureBoundingBoxIn, 2, 1, 2, 1, true, 1);
+                }
+                else
+                {
+                    this.spawnVillagers(worldIn, structureBoundingBoxIn, 2, 1, 2, 1, false);
+                }
                 return true;
             }
 
@@ -1086,9 +1109,15 @@ public class VillageStructures
                         this.replaceAirAndLiquidDownwards(worldIn, iblockstate, j, -1, k, structureBoundingBoxIn);
                     }
                 }
-
-                this.spawnVillagers(worldIn, structureBoundingBoxIn, 7, 1, 1, 1, false);
-                this.spawnVillagers(worldIn, structureBoundingBoxIn, 7, 1, 1, 1, true);
+                if (Config.overwriteOriginalVillagers)
+                {
+                    this.spawnIvVillagers(worldIn, structureBoundingBoxIn, 7, 1, 1, 1, true, 3);
+                }
+                else
+                {
+                	this.spawnVillagers(worldIn, structureBoundingBoxIn, 7, 1, 1, 1, false);
+                    this.spawnVillagers(worldIn, structureBoundingBoxIn, 7, 1, 1, 1, true);
+                }
                 return true;
             }
 
@@ -1266,8 +1295,14 @@ public class VillageStructures
 	                this.replaceAirAndLiquidDownwards(worldIn, iblockstate, j2, -1, j1, structureBoundingBoxIn);
 	            }
 	        }
-	
-	        this.spawnVillagers(worldIn, structureBoundingBoxIn, 4, 1, 2, 2, true);
+	        if (Config.overwriteOriginalVillagers)
+	        {
+		        this.spawnIvVillagers(worldIn, structureBoundingBoxIn, 4, 1, 2, 2, true, r.nextInt(6));
+	        }
+	        else
+	        {
+		        this.spawnVillagers(worldIn, structureBoundingBoxIn, 4, 1, 2, 2, true);
+	        }
 	        return true;
 	    }
 	}
@@ -1418,8 +1453,14 @@ public class VillageStructures
                         this.replaceAirAndLiquidDownwards(worldIn, iblockstate, i, -1, j, structureBoundingBoxIn);
                     }
                 }
-
-                this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1, true);
+                if (Config.overwriteOriginalVillagers)
+                {
+                    this.spawnIvVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1, true, r.nextInt(6));
+                }
+                else
+                {
+                    this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1, true);
+                }
                 return true;
             }
         }
@@ -2011,10 +2052,80 @@ public class VillageStructures
 			                entityvillager.setProfession(this.chooseForgeProfession(i, entityvillager.getProfessionForge()));
 			                entityvillager.finalizeMobSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityvillager)), (IEntityLivingData)null, false);
 			                if (allow_children){
-			                	if (r.nextInt(2) == 0){
+			                	if (r.nextInt(3) == 0){
 			                		entityvillager.setGrowingAge(-23000);
 			                	}
 			                }
+			                worldIn.spawnEntity(entityvillager);
+			            }
+			        }
+			    }
+			}
+			protected void spawnIvVillagers(World worldIn, StructureBoundingBox structurebb, int x, int y, int z, int count, boolean allow_children, int prof)
+			{
+			    if (this.villagersSpawned < count)
+			    {
+			        for (int i = this.villagersSpawned; i < count; ++i)
+			        {
+			            int j = this.getXWithOffset(x + i, z);
+			            int k = this.getYWithOffset(y);
+			            int l = this.getZWithOffset(x + i, z);
+			
+			            if (!structurebb.isVecInside(new BlockPos(j, k, l)))
+			            {
+			                break;
+			            }
+			
+			            ++this.villagersSpawned;
+			
+			            if (this.isZombieInfested)
+			            {
+			                EntityZombieVillager entityzombievillager = new EntityZombieVillager(worldIn);
+			                entityzombievillager.setLocationAndAngles((double)j + 0.5D, (double)k, (double)l + 0.5D, 0.0F, 0.0F);
+			                entityzombievillager.onInitialSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityzombievillager)), (IEntityLivingData)null);
+			                entityzombievillager.enablePersistence();
+			                worldIn.spawnEntity(entityzombievillager);
+			            }
+			            else
+			            {
+			            	if (allow_children)
+			            	{
+			            		int Gender;
+				    		    Gender = r.nextInt(2) + 1;
+				    	        String Name = IvVillager.random_name(Gender);
+				                IvVillager entityvillager = new IvVillager(worldIn, prof, Gender, Name);
+				                entityvillager.setLocationAndAngles((double)j + 0.5D, (double)k, (double)l + 0.5D, 0.0F, 0.0F);
+				                entityvillager.setProfession(this.chooseForgeProfession(i, entityvillager.getProfessionForge()));
+				                entityvillager.finalizeMobSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityvillager)), (IEntityLivingData)null, false);
+				                worldIn.spawnEntity(entityvillager);
+				                if (r.nextInt(3) == 0)
+				                {
+				                	UUID father_id = entityvillager.getUniqueID();
+				                	Gender = r.nextInt(2) + 1;
+					    	        Name = IvVillager.random_name(Gender);
+					                IvVillager entityvillager2 = new IvVillager(worldIn, prof, Gender, Name);
+					                entityvillager2.setLocationAndAngles((double)j + 0.5D, (double)k, (double)l + 0.5D, 0.0F, 0.0F);
+					                entityvillager2.setProfession(this.chooseForgeProfession(i, entityvillager2.getProfessionForge()));
+					                entityvillager2.finalizeMobSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityvillager2)), (IEntityLivingData)null, false);
+					                worldIn.spawnEntity(entityvillager2);
+					                UUID mother_id = entityvillager2.getUniqueID();
+					    		    Gender = r.nextInt(2) + 1;
+					    	        Name = IvVillager.random_name(Gender);
+					                IvVillager entityvillager3 = new IvVillager(worldIn, prof, Gender, Name, father_id, mother_id);
+					                entityvillager3.setGrowingAge(-23000);
+					                entityvillager3.setLocationAndAngles((double)j + 0.5D, (double)k, (double)l + 0.5D, 0.0F, 0.0F);
+					                entityvillager3.setProfession(this.chooseForgeProfession(i, entityvillager.getProfessionForge()));
+					                entityvillager3.finalizeMobSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityvillager3)), (IEntityLivingData)null, false);
+					                worldIn.spawnEntity(entityvillager3);
+				                }
+			            	}
+			            	int Gender;
+			    		    Gender = r.nextInt(2) + 1;
+			    	        String Name = IvVillager.random_name(Gender);
+			                IvVillager entityvillager = new IvVillager(worldIn, prof, Gender, Name);
+			                entityvillager.setLocationAndAngles((double)j + 0.5D, (double)k, (double)l + 0.5D, 0.0F, 0.0F);
+			                entityvillager.setProfession(this.chooseForgeProfession(i, entityvillager.getProfessionForge()));
+			                entityvillager.finalizeMobSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityvillager)), (IEntityLivingData)null, false);
 			                worldIn.spawnEntity(entityvillager);
 			            }
 			        }
@@ -2430,8 +2541,14 @@ public class VillageStructures
                         this.replaceAirAndLiquidDownwards(worldIn, iblockstate, j, -1, i, structureBoundingBoxIn);
                     }
                 }
-
-                this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1, true);
+                if (Config.overwriteOriginalVillagers)
+                {
+                    this.spawnIvVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1, true, 0);
+                }
+                else
+                {
+                    this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1, true);
+                }
                 return true;
      
             }

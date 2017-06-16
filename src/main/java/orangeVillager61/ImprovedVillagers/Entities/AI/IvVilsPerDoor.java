@@ -4,7 +4,6 @@ import java.util.Random;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.village.Village;
 import net.minecraft.world.World;
@@ -15,7 +14,7 @@ public class IvVilsPerDoor extends EntityAIBase
 {
 	public final double VilPerDoor = Config.VilPerDoor;
     private final IvVillager villagerObj;
-    private EntityVillager mate;
+    private IvVillager mate;
     int mateAgain;
     protected Random rand = new Random();
     private World world;
@@ -52,11 +51,15 @@ public class IvVilsPerDoor extends EntityAIBase
             }
             else if (this.checkSufficientDoorsPresentForNewVillager() && this.villagerObj.getIsWillingToMate(true))
             {
-                Entity entity = this.world.findNearestEntityWithinAABB(IvVillager.class, this.villagerObj.getEntityBoundingBox().expand(8.0D, 3.0D, 8.0D), this.villagerObj);
+                IvVillager entity = this.world.findNearestEntityWithinAABB(IvVillager.class, this.villagerObj.getEntityBoundingBox().expand(8.0D, 3.0D, 8.0D), this.villagerObj);
 
                 if (entity == null)
                 {
                     return false;
+                }
+                else if (entity.getGender() == this.villagerObj.getGender())
+                {
+                	return false;
                 }
                 else
                 {
@@ -136,8 +139,18 @@ public class IvVilsPerDoor extends EntityAIBase
 
     private void giveBirth()
     {
-        EntityVillager entityvillager = this.villagerObj.createChild(this.mate);
-        EntityVillager entityvillager2 = this.villagerObj.createChild(this.mate);
+    	IvVillager entityvillager; 
+    	IvVillager entityvillager2;
+    	if (villagerObj.getGender() == 1)
+    	{
+        	entityvillager = this.villagerObj.createChild(this.mate, this.villagerObj.getUniqueID(), this.mate.getUniqueID());
+        	entityvillager2 = this.villagerObj.createChild(this.mate, this.villagerObj.getUniqueID(), this.mate.getUniqueID());
+    	}
+    	else
+    	{
+        	entityvillager = this.villagerObj.createChild(this.mate, this.mate.getUniqueID(), this.villagerObj.getUniqueID());
+        	entityvillager2 = this.villagerObj.createChild(this.mate, this.mate.getUniqueID(), this.villagerObj.getUniqueID());
+    	}
         this.mate.setGrowingAge(6000);
         this.villagerObj.setGrowingAge(6000);
         if (Config.MateAgain){

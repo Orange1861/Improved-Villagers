@@ -12,6 +12,8 @@ public class Config {
 	public static int VillageDistance;
 	public static boolean overwriteOriginalVillagers;
 	public static boolean enableIvTexture;
+	public static int adult_days;
+	public static boolean enable_Metro;
 	
 	public final static Config instance = new Config();
 	
@@ -25,8 +27,10 @@ public class Config {
 	MateAgain = config.getBoolean("Mate Again", Configuration.CATEGORY_GENERAL, true, "Set this to true if you want a chance(1/3) that villagers to be willing to mate again after mating.");
 	enableDrops = config.getBoolean("Enable Villager Drops", Configuration.CATEGORY_GENERAL, true, "If this is set to true, villager drops will be enabled.");
 	overwriteOriginalVillagers = config.getBoolean("Override Original Villagers?", Configuration.CATEGORY_GENERAL, true, "If this is set to true, then villagers will be overridden by the mod.");
-	enableVillages = config.getBoolean("Enable Villages", Configuration.CATEGORY_GENERAL, true, "If this is set to true, this mod's villages will be enabled. Should fix village incompatibilities with other mods");
+	enableVillages = config.getBoolean("Enable Villages", Configuration.CATEGORY_GENERAL, true, "If this is set to true, this mod's villages will be enabled. Disabling this should fix village incompatibilities with other mods");
 	VillageDistance = config.getInt("Village Distance", Configuration.CATEGORY_GENERAL, 24, 2, 1024, "For each of this number of blocks, a village will try to spawn, Unmodded:32. This is will not do anything if Enable Villages is set to false");
+	enable_Metro = config.getBoolean("Enable Cities", Configuration.CATEGORY_GENERAL, true, "If this is set to true, then there will be a 1/20 chance of cities (massive villages) will spawn. May be buggy");
+	adult_days = config.getInt("Number of Minecraft Days as Adult", Configuration.CATEGORY_GENERAL, 45, 2, 1024, "This is the number of mc days that a villager will live, each life stage will take up 1/3 of the number of mc days set.");
 	if (config.hasChanged())
 	{
 		config.save();
