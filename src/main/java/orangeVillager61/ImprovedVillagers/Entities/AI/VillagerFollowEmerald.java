@@ -4,6 +4,7 @@ import java.util.Set;
 
 import com.google.common.collect.Sets;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,7 +20,6 @@ public class VillagerFollowEmerald extends EntityAIBase
     /** The entity using this AI that is tempted by the player. */
     private final EntityCreature temptedEntity;
     private final double speed;
-    protected World world;
     /** X position of player tempting this mob */
     private double targetX;
     /** Y position of player tempting this mob */
@@ -39,25 +39,24 @@ public class VillagerFollowEmerald extends EntityAIBase
     private int delayTemptCounter;
     /** True if this EntityAITempt task is running */
     private boolean isRunning;
+    private Village villageObj;
     private final Set<Item> temptItem;
     /** Whether the entity using this AI will be scared by the tempter's sudden movement. */
     private final boolean scaredByPlayerMovement;
-	protected Village ivillageObj;
 
-    public VillagerFollowEmerald(EntityCreature temptedEntityIn, double speedIn, Item temptItemIn, boolean scaredByPlayerMovementIn)
+    public VillagerFollowEmerald(EntityCreature temptedEntityIn, double speedIn, Item temptItemIn, boolean scaredByPlayerMovementIn, Village villageObj)
     {
-        this(temptedEntityIn, speedIn, scaredByPlayerMovementIn, Sets.newHashSet(new Item[] {temptItemIn}), null);
+        this(temptedEntityIn, speedIn, scaredByPlayerMovementIn, Sets.newHashSet(new Item[] {temptItemIn}), villageObj);
     }
 
-    public VillagerFollowEmerald(EntityCreature temptedEntityIn, double speedIn, boolean scaredByPlayerMovementIn, Set<Item> temptItemIn, World world)
+    public VillagerFollowEmerald(EntityCreature temptedEntityIn, double speedIn, boolean scaredByPlayerMovementIn, Set<Item> temptItemIn, Village villageObj)
     {
         this.temptedEntity = temptedEntityIn;
         this.speed = speedIn;
-        this.world = world;
         this.temptItem = temptItemIn;
         this.scaredByPlayerMovement = scaredByPlayerMovementIn;
         this.setMutexBits(3);
-
+        this.villageObj = villageObj;
         if (!(temptedEntityIn.getNavigator() instanceof PathNavigateGround))
         {
             throw new IllegalArgumentException("Unsupported mob type for TemptGoal");
@@ -69,16 +68,16 @@ public class VillagerFollowEmerald extends EntityAIBase
      */
     public boolean shouldExecute()
     {
-        if (this.delayTemptCounter > 0)
-        {
-            --this.delayTemptCounter;
-            return false;
-        }
-        else
-        {
-            this.temptingPlayer = this.temptedEntity.world.getClosestPlayerToEntity(this.temptedEntity, 10.0D);
-            return this.temptingPlayer == null ? false : this.isTempting(this.temptingPlayer.getHeldItemMainhand()) || this.isTempting(this.temptingPlayer.getHeldItemOffhand());
-        }
+	        if (this.delayTemptCounter > 0)
+	        {
+	            --this.delayTemptCounter;
+	            return false;
+	        }
+	        else
+	        {
+	            this.temptingPlayer = this.temptedEntity.worldObj.getClosestPlayerToEntity(this.temptedEntity, 10.0D);
+	            return this.temptingPlayer == null ? false : this.isTempting(this.temptingPlayer.getHeldItemMainhand()) || this.isTempting(this.temptingPlayer.getHeldItemOffhand());
+	        }
     }
 
     protected boolean isTempting(ItemStack stack)
@@ -91,40 +90,39 @@ public class VillagerFollowEmerald extends EntityAIBase
      */
     public boolean continueExecuting()
     {
-    	if (this.world.isRemote == false){
-        	BlockPos blockpos = temptedEntity.getPosition();
-			this.ivillageObj = this.world.getVillageCollection().getNearestVillage(blockpos, 32);
+    	if (!this.temptedEntity.getEntityWorld().isRemote){
+    	System.out.println(this.villageObj.getPlayerReputation(this.temptingPlayer.getName()));
+    	if (this.villageObj.getPlayerReputation(this.temptingPlayer.getName()) < -9)
+        {
+        	return false;
         }
-    	if (this.world.isRemote == false){
-    		if (this.ivillageObj.getPlayerReputation(temptingPlayer.getName()) > -1){
-		        if (this.scaredByPlayerMovement)
-		        {
-		            if (this.temptedEntity.getDistanceSqToEntity(this.temptingPlayer) < 36.0D)
-		            {
-		                if (this.temptingPlayer.getDistanceSq(this.targetX, this.targetY, this.targetZ) > 0.010000000000000002D)
-		                {
-		                    return false;
-		                }
-		
-		                if (Math.abs((double)this.temptingPlayer.rotationPitch - this.pitch) > 5.0D || Math.abs((double)this.temptingPlayer.rotationYaw - this.yaw) > 5.0D)
-		                {
-		                    return false;
-		                }
-		            }
-		            else
-		            {
-		                this.targetX = this.temptingPlayer.posX;
-		                this.targetY = this.temptingPlayer.posY;
-		                this.targetZ = this.temptingPlayer.posZ;
-		            }
-		
-		            this.pitch = (double)this.temptingPlayer.rotationPitch;
-		            this.yaw = (double)this.temptingPlayer.rotationYaw;
-		        }
-	    	}
-	        return this.shouldExecute();
     	}
-		return false;
+        if (this.scaredByPlayerMovement)
+        {
+            if (this.temptedEntity.getDistanceSqToEntity(this.temptingPlayer) < 36.0D)
+            {
+                if (this.temptingPlayer.getDistanceSq(this.targetX, this.targetY, this.targetZ) > 0.010000000000000002D)
+                {
+                    return false;
+                }
+
+                if (Math.abs((double)this.temptingPlayer.rotationPitch - this.pitch) > 5.0D || Math.abs((double)this.temptingPlayer.rotationYaw - this.yaw) > 5.0D)
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                this.targetX = this.temptingPlayer.posX;
+                this.targetY = this.temptingPlayer.posY;
+                this.targetZ = this.temptingPlayer.posZ;
+            }
+
+            this.pitch = (double)this.temptingPlayer.rotationPitch;
+            this.yaw = (double)this.temptingPlayer.rotationYaw;
+        }
+
+        return this.shouldExecute();
     }
 
     /**

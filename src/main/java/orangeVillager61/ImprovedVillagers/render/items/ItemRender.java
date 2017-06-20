@@ -15,13 +15,13 @@ public class ItemRender {
 public static String modid = Reference.MOD_ID;
 
 	public static void registerItemRenderer() {
-		reg(IvItems.thieving_nose);
+		
 		reg(IvItems.raw_villager);
 		reg(IvItems.cooked_villager);
 	}
 
 	public static void reg(Item item) {
-	    Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
+	    Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(item, 0, new ModelResourceLocation(modid + ":" + item.getUnlocalizedName().substring(5), "inventory"));
 	}
 
 }

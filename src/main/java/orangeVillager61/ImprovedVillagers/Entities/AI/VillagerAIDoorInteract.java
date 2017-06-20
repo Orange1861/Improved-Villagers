@@ -112,7 +112,7 @@ public abstract class VillagerAIDoorInteract extends EntityAIBase
 
     private BlockFenceGate getBlockDoor(BlockPos pos)
     {
-        IBlockState iblockstate = this.theEntity.world.getBlockState(pos);
+        IBlockState iblockstate = this.theEntity.worldObj.getBlockState(pos);
         Block block1 = iblockstate.getBlock();
         return block1 instanceof BlockFenceGate && iblockstate.getMaterial() == Material.WOOD ? (BlockFenceGate)block1 : null;
     }

@@ -24,7 +24,7 @@ import orangeVillager61.ImprovedVillagers.generation.VillageStructures;
 
 public class IvMapGenVillage extends MapGenVillage
 {
-    private final static List<Biome> VILLAGE_SPAWN_BIOMES = Arrays.<Biome>asList(new Biome[] {Biomes.PLAINS, Biomes.DESERT, Biomes.SAVANNA, Biomes.TAIGA, Biomes.TAIGA_HILLS, Biomes.REDWOOD_TAIGA, Biomes.REDWOOD_TAIGA_HILLS, Biomes.MESA, Biomes.MESA_ROCK, Biomes.MESA_CLEAR_ROCK});
+    private final static List<Biome> VILLAGE_SPAWN_BIOMES = Arrays.<Biome>asList(new Biome[] {Biomes.SAVANNA_PLATEAU, Biomes.PLAINS, Biomes.DESERT, Biomes.SAVANNA, Biomes.FOREST, Biomes.FOREST_HILLS, Biomes.TAIGA, Biomes.TAIGA_HILLS, Biomes.REDWOOD_TAIGA, Biomes.REDWOOD_TAIGA_HILLS, Biomes.MESA, Biomes.MESA_ROCK, Biomes.MESA_CLEAR_ROCK});
 	/** None */
     private int size;
     private int distance;
@@ -35,9 +35,9 @@ public class IvMapGenVillage extends MapGenVillage
     public IvMapGenVillage()
     {
         this.distance = Config.VillageDistance;
-        this.minTownSeparation = 3;
-        this.isMetropolis = false;
-        if (r.nextInt(20) + 1 == 2){
+        this.minTownSeparation = 4;
+        this.isMetropolis = true;
+        if (r.nextInt(20) + 1 == 2 && Config.enable_Metro){
         	this.isMetropolis = true;
         }
     }
@@ -85,8 +85,8 @@ public class IvMapGenVillage extends MapGenVillage
         Random random = this.world.setRandomSeed(k, l, 10387312);
         k = k * this.distance;
         l = l * this.distance;
-        k = k + random.nextInt(this.distance - 8);
-        l = l + random.nextInt(this.distance - 8);
+        k = k + random.nextInt(this.distance/2);
+        l = l + random.nextInt(this.distance/2);
 
         if (i == k && j == l)
         {

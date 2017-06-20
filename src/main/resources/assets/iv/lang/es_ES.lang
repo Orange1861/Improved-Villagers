@@ -1,0 +1,16 @@
+//Items
+item.raw_villager.name=Aldeano Crudo
+item.cooked_villager.name=Aldeano Cocido
+item.thieving_nose.name=Nariz de Ladrones
+item.notification_marker.name=Marcador de Notificación
+
+//Blocks
+tile.villager_nose.name=Nariz de Aldeano
+tile.clay1_door.name=Clay Door
+tile.light_blue_stairs.name=Azul Claro Templado Arcilla Escaleras
+
+//Creative Tabs
+itemGroup.tabIv=Aldeanos Mejorados
+
+//Death Messages
+death.attack.iv.old_age=%1$s murió de vejez
