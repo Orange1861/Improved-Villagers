@@ -21,15 +21,13 @@ public static String modid = Reference.MOD_ID;
 	public static void registerBlockRenderer() {
 		
 	    reg(IvBlocks.villager_nose);
-	    reg(IvBlocks.light_blue_stairs);
-	    //reg(IvBlocks.clay1_door);
 	}
 
 	public static void reg(Block block) {
-	    Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(block), 0, new ModelResourceLocation(block.getRegistryName(), "inventory"));
+	    Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(block), 0, new ModelResourceLocation(modid + ":" + block.getUnlocalizedName().substring(5), "inventory"));
 	}
 	
 	public static void reg(Block block, int meta, String file) {
-		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(block), meta, new ModelResourceLocation(file, "inventory"));
+		Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(Item.getItemFromBlock(block), meta, new ModelResourceLocation(modid + ":" + file, "inventory"));
 	}
 }

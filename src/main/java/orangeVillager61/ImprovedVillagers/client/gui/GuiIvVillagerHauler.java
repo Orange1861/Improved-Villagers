@@ -40,13 +40,13 @@ public class GuiIvVillagerHauler extends GuiContainer{
 			{
 				this.button_text = "Follow";
 			}
-        this.addButton(new ButtonFollow(0, this.getGuiLeft() + 118, this.getGuiTop() + 20, 50, 20, this.button_text, this.villager));
+        this.addButton(new ButtonFollow(0, this.guiLeft + 118, this.guiTop + 20, 50, 20, this.button_text, this.villager));
 	}
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		this.mc.getTextureManager().bindTexture(new ResourceLocation(Reference.MOD_ID, "gui/nitwit_tab.png"));
-		this.drawTexturedModalRect(this.getGuiLeft(), this.getGuiTop(), 0, 0, this.xSize, this.ySize);
+		this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
 	}
 	@Override
     protected void actionPerformed(GuiButton button)
@@ -67,8 +67,8 @@ public class GuiIvVillagerHauler extends GuiContainer{
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         String s = this.villager.getName();
-        this.mc.fontRenderer.drawString(s, this.xSize / 2 - this.mc.fontRenderer.getStringWidth(s) / 2, 6, 4210752);
-        this.mc.fontRenderer.drawString(this.playerInv.getDisplayName().getFormattedText(), 8, 72, 4210752); 
+        this.mc.fontRendererObj.drawString(s, this.xSize / 2 - this.mc.fontRendererObj.getStringWidth(s) / 2, 6, 4210752);
+        this.mc.fontRendererObj.drawString(this.playerInv.getDisplayName().getFormattedText(), 8, 72, 4210752); 
     }
 
 

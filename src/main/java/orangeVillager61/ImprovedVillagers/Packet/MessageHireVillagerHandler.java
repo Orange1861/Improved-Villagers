@@ -23,7 +23,7 @@ public class MessageHireVillagerHandler  implements IMessageHandler<MessageHireV
 	
 	@Override public IMessage onMessage(MessageHireVillager message, MessageContext ctx) {
 		 // This is the player the packet was sent to the server from
-		 EntityPlayerMP serverPlayer = ctx.getServerHandler().player;
+		 EntityPlayerMP serverPlayer = ctx.getServerHandler().playerEntity;
 		 // The value that was sent
 		 serverPlayer.mcServer.addScheduledTask(new Runnable_Hire_Villager(message, ctx));
 		 // No response packet
@@ -38,9 +38,9 @@ class Runnable_Hire_Villager implements Runnable{
 	private World world;
 	
 	public Runnable_Hire_Villager(MessageHireVillager message, MessageContext ctx){
-	     this.player = ctx.getServerHandler().player;
+	     this.player = ctx.getServerHandler().playerEntity;
 		 this.entityID = message.entityID;
-		 this.world = this.player.world;
+		 this.world = this.player.worldObj;
 	}
 
 	@Override

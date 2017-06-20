@@ -19,7 +19,7 @@ public class MessageChangeFollowHandler implements IMessageHandler<MessageChange
 
 @Override public IMessage onMessage(MessageChangeFollow message, MessageContext ctx) {
  // This is the player the packet was sent to the server from
- EntityPlayerMP serverPlayer = ctx.getServerHandler().player;
+ EntityPlayerMP serverPlayer = ctx.getServerHandler().playerEntity;
  // The value that was sent
  serverPlayer.mcServer.addScheduledTask(new Runnable_Change_Follow(message, ctx));
  // No response packet
@@ -35,9 +35,9 @@ class Runnable_Change_Follow implements Runnable{
 
 	 public Runnable_Change_Follow(MessageChangeFollow message, MessageContext ctx)
 	 {
-	     this.player = ctx.getServerHandler().player;
+	     this.player = ctx.getServerHandler().playerEntity;
 		 this.entityID = message.entityID;
-		 this.world = this.player.world;
+		 this.world = this.player.worldObj;
 	 }
 	@Override
 	public void run() {

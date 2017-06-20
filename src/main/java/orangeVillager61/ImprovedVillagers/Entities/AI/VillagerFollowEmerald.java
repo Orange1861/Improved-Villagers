@@ -75,7 +75,7 @@ public class VillagerFollowEmerald extends EntityAIBase
 	        }
 	        else
 	        {
-	            this.temptingPlayer = this.temptedEntity.world.getClosestPlayerToEntity(this.temptedEntity, 10.0D);
+	            this.temptingPlayer = this.temptedEntity.worldObj.getClosestPlayerToEntity(this.temptedEntity, 10.0D);
 	            return this.temptingPlayer == null ? false : this.isTempting(this.temptingPlayer.getHeldItemMainhand()) || this.isTempting(this.temptingPlayer.getHeldItemOffhand());
 	        }
     }
@@ -91,8 +91,8 @@ public class VillagerFollowEmerald extends EntityAIBase
     public boolean continueExecuting()
     {
     	if (!this.temptedEntity.getEntityWorld().isRemote){
-    	System.out.println(this.villageObj.getPlayerReputation(this.temptingPlayer.getUniqueID()));
-    	if (this.villageObj.getPlayerReputation(this.temptingPlayer.getUniqueID()) < -9)
+    	System.out.println(this.villageObj.getPlayerReputation(this.temptingPlayer.getName()));
+    	if (this.villageObj.getPlayerReputation(this.temptingPlayer.getName()) < -9)
         {
         	return false;
         }

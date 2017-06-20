@@ -43,20 +43,20 @@ public class GuiIvVillagerHireNitwit extends GuiContainer{
 	public void initGui()
 	{
 		super.initGui();
-        this.addButton(new GuiButton(0, this.getGuiLeft() + 115, this.getGuiTop() + 20, 50, 20, "Hire"));
+        this.addButton(new GuiButton(0, this.guiLeft + 115, this.guiTop + 20, 50, 20, "Hire"));
 	}
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		this.mc.getTextureManager().bindTexture(new ResourceLocation(Reference.MOD_ID, "gui/hire_nitwit.png"));
-		this.drawTexturedModalRect(this.getGuiLeft(), this.getGuiTop(), 0, 0, this.xSize, this.ySize);
+		this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
 	}
 	
 	@Override
     protected void actionPerformed(GuiButton button)
     {
 		final ItemStack stack = this.inventorySlots.getSlot(0).getStack();
-		if (stack.getCount() >= villager.getHireCost() && stack.getItem() == Items.EMERALD){ 
+		if (stack.stackSize >= villager.getHireCost() && stack.getItem() == Items.EMERALD){ 
         	Reference.PACKET_MODID.sendToServer(new MessageHireVillager(this.villager.getEntityId()));
         }
     }
@@ -66,9 +66,9 @@ public class GuiIvVillagerHireNitwit extends GuiContainer{
     {
         String s = this.villager.getName();
 
-        this.mc.fontRenderer.drawString(String.valueOf(villager.getHireCost()), 46, 50, 4210752);
-        this.mc.fontRenderer.drawString(s, this.xSize / 2 - this.mc.fontRenderer.getStringWidth(s) / 2, 6, 4210752);
-        this.mc.fontRenderer.drawString(this.playerInv.getDisplayName().getFormattedText(), 8, 72, 4210752);
+        this.mc.fontRendererObj.drawString(String.valueOf(villager.getHireCost()), 46, 50, 4210752);
+        this.mc.fontRendererObj.drawString(s, this.xSize / 2 - this.mc.fontRendererObj.getStringWidth(s) / 2, 6, 4210752);
+        this.mc.fontRendererObj.drawString(this.playerInv.getDisplayName().getFormattedText(), 8, 72, 4210752);
     }
 
 }

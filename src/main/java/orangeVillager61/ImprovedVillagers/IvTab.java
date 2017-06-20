@@ -12,8 +12,8 @@ public class IvTab extends CreativeTabs{
 	}
 
 	@Override
-	public ItemStack getTabIconItem() {
-		return new ItemStack (Items.EMERALD);
+	public Item getTabIconItem() {
+		return Items.EMERALD;
 	}
 
 }

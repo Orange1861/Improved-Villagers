@@ -42,13 +42,13 @@ public class GuiIvVillagerInfo extends GuiContainer{
 	public void initGui()
 	{
 		super.initGui();
-        this.addButton(new GuiButton(0, this.getGuiLeft(), this.getGuiTop(), 50, 20, "Info"));
+        this.addButton(new GuiButton(0, this.guiLeft, this.guiTop, 50, 20, "Info"));
 	}
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		this.mc.getTextureManager().bindTexture(new ResourceLocation(Reference.MOD_ID, "gui/info_gui.png"));
-		this.drawTexturedModalRect(this.getGuiLeft(), this.getGuiTop(), 0, 0, this.xSize, this.ySize);
+		this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
 	}
 	
 	@Override
@@ -70,9 +70,9 @@ public class GuiIvVillagerInfo extends GuiContainer{
         else if (this.villager.getGender() == 2){
         	g = "Female";
         }
-        this.mc.fontRenderer.drawString("Name: " + s, 12, 30, 4210752);
-        this.mc.fontRenderer.drawString("Life Stage: " + this.villager.getAdultAge(), 12, 48, 4210752);
-        this.mc.fontRenderer.drawString("Gender: " + g, 12, 66, 4210752);
+        this.mc.fontRendererObj.drawString("Name: " + s, 12, 30, 4210752);
+        this.mc.fontRendererObj.drawString("Life Stage: " + this.villager.getAdultAge(), 12, 48, 4210752);
+        this.mc.fontRendererObj.drawString("Gender: " + g, 12, 66, 4210752);
         if (this.villager.getMaxHealth() * 0.75 <= this.villager.getHealth())
         {
         	health_amount = "Slightly Wounded";
@@ -101,16 +101,16 @@ public class GuiIvVillagerInfo extends GuiContainer{
         {
         	health_amount = "Perfectly Healthy";
         }
-        this.mc.fontRenderer.drawString("Health: " + health_amount + "(" + String.valueOf(this.villager.getHealth()) + ")", 12, 84, 4210752);
+        this.mc.fontRendererObj.drawString("Health: " + health_amount + "(" + String.valueOf(this.villager.getHealth()) + ")", 12, 84, 4210752);
         if (!(this.villager.getMotherId() == null))
         {
-            this.mc.fontRenderer.drawString("Mother: " + this.villager.getMotherName(), 12, 102, 4210752);
+            this.mc.fontRendererObj.drawString("Mother: " + this.villager.getMotherName(), 12, 102, 4210752);
         }
         if (!(this.villager.getFatherId() == null))
         {
-            this.mc.fontRenderer.drawString("Father: " + this.villager.getFatherName(), 12, 120, 4210752);
+            this.mc.fontRendererObj.drawString("Father: " + this.villager.getFatherName(), 12, 120, 4210752);
         }
-        this.mc.fontRenderer.drawString(this.playerInv.getDisplayName().getFormattedText(), 8, 138, 4210752);
+        this.mc.fontRendererObj.drawString(this.playerInv.getDisplayName().getFormattedText(), 8, 138, 4210752);
     }
 
 }

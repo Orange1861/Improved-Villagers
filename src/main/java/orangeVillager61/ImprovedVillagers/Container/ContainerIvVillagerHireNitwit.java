@@ -39,7 +39,7 @@ public class ContainerIvVillagerHireNitwit extends Container{
 	}
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
-	    ItemStack previous = ItemStack.EMPTY;
+        ItemStack previous = null;
 	    Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 
 	    if (slot != null && slot.getHasStack()) {
@@ -49,20 +49,20 @@ public class ContainerIvVillagerHireNitwit extends Container{
 	        if (fromSlot < this.handler.getSlots()) {
 	            // From the block breaker inventory to player's inventory
 	            if (!this.mergeItemStack(current, handler.getSlots(), handler.getSlots() + 36, true))
-	                return ItemStack.EMPTY;
+	                return (ItemStack) null;
 	        } else {
 	            // From the player's inventory to block breaker's inventory
 	            if (!this.mergeItemStack(current, 0, handler.getSlots(), false))
-	                return ItemStack.EMPTY;
+	                return (ItemStack) null;
 	        }
 
-	        if (current.getCount() == 0) //Use func_190916_E() instead of stackSize 1.11 only 1.11.2 use getCount()
-	            slot.putStack(ItemStack.EMPTY); //Use ItemStack.field_190927_a instead of (ItemStack)null for a blank item stack. In 1.11.2 use ItemStack.EMPTY
+	        if (current.stackSize == 0) //Use func_190916_E() instead of stackSize 1.11 only 1.11.2 use getCount()
+	            slot.putStack((ItemStack) null); //Use ItemStack.field_190927_a instead of (ItemStack)null for a blank item stack. In 1.11.2 use ItemStack.EMPTY
 	        else
 	            slot.onSlotChanged();
 
-	        if (current.getCount() == previous.getCount())
-	        slot.onTake(playerIn, current);
+	        if (current.stackSize == previous.stackSize)
+	        slot.onPickupFromSlot(playerIn, current);
 	    }
 	    return previous;
 	}

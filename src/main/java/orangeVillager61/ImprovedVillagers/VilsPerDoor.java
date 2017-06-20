@@ -1,30 +1,29 @@
-package orangeVillager61.ImprovedVillagers.Entities.AI;
+package orangeVillager61.ImprovedVillagers;
 
 import java.util.Random;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.village.Village;
 import net.minecraft.world.World;
-import orangeVillager61.ImprovedVillagers.Config;
-import orangeVillager61.ImprovedVillagers.Entities.IvVillager;
 
-public class IvVilsPerDoor extends EntityAIBase
+public class VilsPerDoor extends EntityAIBase
 {
 	public final double VilPerDoor = Config.VilPerDoor;
-    private final IvVillager villagerObj;
-    private IvVillager mate;
+    private EntityVillager villagerObj;
+    private EntityVillager mate;
     int mateAgain;
     protected Random rand = new Random();
-    private World world;
+    private World worldObj;
     private int matingTimeout;
     Village villageObj;
 
-    public IvVilsPerDoor(IvVillager villagerIn)
+    public VilsPerDoor(EntityVillager villagerIn)
     {
         this.villagerObj = villagerIn;
-        this.world = villagerIn.worldObj;
+        this.worldObj = villagerIn.worldObj;
         this.setMutexBits(3);
     }
 
@@ -43,7 +42,7 @@ public class IvVilsPerDoor extends EntityAIBase
         }
         else
         {
-            this.villageObj = this.world.getVillageCollection().getNearestVillage(new BlockPos(this.villagerObj), 0);
+            this.villageObj = this.worldObj.getVillageCollection().getNearestVillage(new BlockPos(this.villagerObj), 0);
 
             if (this.villageObj == null)
             {
@@ -51,19 +50,15 @@ public class IvVilsPerDoor extends EntityAIBase
             }
             else if (this.checkSufficientDoorsPresentForNewVillager() && this.villagerObj.getIsWillingToMate(true))
             {
-                IvVillager entity = this.world.findNearestEntityWithinAABB(IvVillager.class, this.villagerObj.getEntityBoundingBox().expand(8.0D, 3.0D, 8.0D), this.villagerObj);
+                Entity entity = this.worldObj.findNearestEntityWithinAABB(EntityVillager.class, this.villagerObj.getEntityBoundingBox().expand(8.0D, 3.0D, 8.0D), this.villagerObj);
 
                 if (entity == null)
                 {
                     return false;
                 }
-                else if (entity.getGender() == this.villagerObj.getGender())
-                {
-                	return false;
-                }
                 else
                 {
-                    this.mate = (IvVillager)entity;
+                    this.mate = (EntityVillager)entity;
                     return this.mate.getGrowingAge() == 0 && this.mate.getIsWillingToMate(true);
                 }
             }
@@ -120,7 +115,7 @@ public class IvVilsPerDoor extends EntityAIBase
 
         if (this.villagerObj.getRNG().nextInt(35) == 0)
         {
-            this.world.setEntityState(this.villagerObj, (byte)12);
+            this.worldObj.setEntityState(this.villagerObj, (byte)12);
         }
     }
 
@@ -139,21 +134,11 @@ public class IvVilsPerDoor extends EntityAIBase
 
     private void giveBirth()
     {
-    	IvVillager entityvillager; 
-    	IvVillager entityvillager2;
-    	if (villagerObj.getGender() == 1)
-    	{
-        	entityvillager = this.villagerObj.createChild(this.mate, this.villagerObj.getUniqueID(), this.mate.getUniqueID());
-        	entityvillager2 = this.villagerObj.createChild(this.mate, this.villagerObj.getUniqueID(), this.mate.getUniqueID());
-    	}
-    	else
-    	{
-        	entityvillager = this.villagerObj.createChild(this.mate, this.mate.getUniqueID(), this.villagerObj.getUniqueID());
-        	entityvillager2 = this.villagerObj.createChild(this.mate, this.mate.getUniqueID(), this.villagerObj.getUniqueID());
-    	}
+        EntityVillager entityvillager = this.villagerObj.createChild(this.mate);
+        EntityVillager entityvillager2 = this.villagerObj.createChild(this.mate);
         this.mate.setGrowingAge(6000);
         this.villagerObj.setGrowingAge(6000);
-        if (Config.MateAgain){
+        if (Config.MateAgain == true){
         	mateAgain = rand.nextInt(3) + 1;
         }
         else{
@@ -170,13 +155,13 @@ public class IvVilsPerDoor extends EntityAIBase
         if (rand.nextInt(100) + 1 <= Config.twins && Config.twins > 0){
         entityvillager2.setGrowingAge(-24000);
         entityvillager2.setLocationAndAngles(this.villagerObj.posX, this.villagerObj.posY, this.villagerObj.posZ, 0.0F, 0.0F);
-        this.world.spawnEntityInWorld(entityvillager2);
-        this.world.setEntityState(entityvillager2, (byte)12);
+        this.worldObj.spawnEntityInWorld(entityvillager2);
+        this.worldObj.setEntityState(entityvillager2, (byte)12);
         }
         entityvillager.setGrowingAge(-24000);
         entityvillager.setLocationAndAngles(this.villagerObj.posX, this.villagerObj.posY, this.villagerObj.posZ, 0.0F, 0.0F);
-        this.world.spawnEntityInWorld(entityvillager);
-        this.world.setEntityState(entityvillager, (byte)12);
+        this.worldObj.spawnEntityInWorld(entityvillager);
+        this.worldObj.setEntityState(entityvillager, (byte)12);
     }
 
 
