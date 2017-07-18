@@ -21,24 +21,24 @@ public class ContainerIvVillagerHauler extends Container{
 		this.villager = villager;
 		this.handler = this.villager.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 		
-		this.addSlotToContainer(new SlotItemHandler(handler, 0, 25, 23));
-		this.addSlotToContainer(new SlotItemHandler(handler, 1, 43, 23));
-		this.addSlotToContainer(new SlotItemHandler(handler, 2, 61, 23));
-		this.addSlotToContainer(new SlotItemHandler(handler, 3, 79, 23));
-		this.addSlotToContainer(new SlotItemHandler(handler, 4, 97, 23));
-		this.addSlotToContainer(new SlotItemHandler(handler, 5, 25, 41));
-		this.addSlotToContainer(new SlotItemHandler(handler, 6, 43, 41));
-		this.addSlotToContainer(new SlotItemHandler(handler, 7, 61, 41));
-		this.addSlotToContainer(new SlotItemHandler(handler, 8, 79, 41));
-		this.addSlotToContainer(new SlotItemHandler(handler, 9, 97, 41));
-		this.addSlotToContainer(new SlotItemHandler(handler, 10, 25, 59));
-		this.addSlotToContainer(new SlotItemHandler(handler, 11, 43, 59));
-		this.addSlotToContainer(new SlotItemHandler(handler, 12, 61, 59));
-		this.addSlotToContainer(new SlotItemHandler(handler, 13, 79, 59));
-		this.addSlotToContainer(new SlotItemHandler(handler, 14, 97, 59));
+		this.addSlotToContainer(new SlotItemHandler(handler, 0, 40, 66));
+		this.addSlotToContainer(new SlotItemHandler(handler, 1, 58, 66));
+		this.addSlotToContainer(new SlotItemHandler(handler, 2, 76, 66));
+		this.addSlotToContainer(new SlotItemHandler(handler, 3, 94, 66));
+		this.addSlotToContainer(new SlotItemHandler(handler, 4, 112, 66));
+		this.addSlotToContainer(new SlotItemHandler(handler, 5, 40, 84));
+		this.addSlotToContainer(new SlotItemHandler(handler, 6, 58, 84));
+		this.addSlotToContainer(new SlotItemHandler(handler, 7, 76, 84));
+		this.addSlotToContainer(new SlotItemHandler(handler, 8, 94, 84));
+		this.addSlotToContainer(new SlotItemHandler(handler, 9, 112, 84));
+		this.addSlotToContainer(new SlotItemHandler(handler, 10, 40, 102));
+		this.addSlotToContainer(new SlotItemHandler(handler, 11, 58, 102));
+		this.addSlotToContainer(new SlotItemHandler(handler, 12, 76, 102));
+		this.addSlotToContainer(new SlotItemHandler(handler, 13, 94, 102));
+		this.addSlotToContainer(new SlotItemHandler(handler, 14, 112, 102));
 
 		int xPos = 8;
-		int yPos = 84;
+		int yPos = 153;
 				
 		for (int y = 0; y < 3; ++y) {
 			for (int x = 0; x < 9; ++x) {

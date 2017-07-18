@@ -102,12 +102,11 @@ public class IvVillager extends EntityVillager{
     private ItemStackHandler item_handler = new ItemStackHandler(15);
     protected int wealth;
     public int robbed_time;
-    //public String Adult_Age;
-    //protected int int_Age;
     protected MerchantRecipeList buyingList;
     protected static final DataParameter<Optional<UUID>> OWNER_DEFINED_ID = EntityDataManager.<Optional<UUID>>createKey(IvVillager.class, DataSerializers.OPTIONAL_UNIQUE_ID);
     //TODO Turn Adult Age into an Enum
     private static final DataParameter<String> Adult_Age = EntityDataManager.<String>createKey(IvVillager.class, DataSerializers.STRING);
+    private static final DataParameter<String> Tab = EntityDataManager.<String>createKey(IvVillager.class, DataSerializers.STRING);
     private static final DataParameter<Integer> int_Age = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
     private static final DataParameter<Boolean> Is_Hired = EntityDataManager.<Boolean>createKey(IvVillager.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> has_init = EntityDataManager.<Boolean>createKey(IvVillager.class, DataSerializers.BOOLEAN);
@@ -334,6 +333,10 @@ public class IvVillager extends EntityVillager{
     	       this.entityDropItem(this.item_handler.getStackInSlot(s), 0);
     	   }
        }
+       for (int i = 0; i < 20; i++)
+       {
+    	   this.entityDropItem(this.villagerInventory.getStackInSlot(i), 0);
+       }
        super.onDeath(cause);
     }
     @Nullable
@@ -376,6 +379,7 @@ public class IvVillager extends EntityVillager{
 		this.getDataManager().register(Father_ID, Optional.<UUID>absent());
 		this.getDataManager().register(int_Age, Integer.valueOf(1));
 		this.getDataManager().register(Adult_Age, String.valueOf(""));
+		this.getDataManager().register(Tab, String.valueOf("Info"));
 		this.getDataManager().register(mother_name, String.valueOf(""));
 		this.getDataManager().register(father_name, String.valueOf(""));
 		this.getDataManager().register(Is_Hired, Boolean.valueOf(false));
@@ -436,6 +440,10 @@ public class IvVillager extends EntityVillager{
 	protected void setMotherName(String name)
     {
         this.dataManager.set(mother_name, name);
+    }
+	protected void setTab(String name)
+    {
+        this.dataManager.set(Tab, name);
     }
 	protected void setFatherName(String name)
     {
@@ -512,6 +520,10 @@ public class IvVillager extends EntityVillager{
     public String getAdultAge()
     {
         return (String)this.dataManager.get(Adult_Age);
+    }
+    public String getTab()
+    {
+        return (String)this.dataManager.get(Tab);
     }
     public String getFatherName()
     {
@@ -590,7 +602,7 @@ public class IvVillager extends EntityVillager{
 	        {
 	        	this.robbed_time -= 1;
 	        }
-	        //this.setMoreVillagerNbtStuff();
+	        this.setMoreVillagerNbtStuff();
 	    }
 	@Override
 	protected void onGrowingAdult()
@@ -674,6 +686,7 @@ public class IvVillager extends EntityVillager{
 		        compound.setInteger("Robbed_Time", this.robbed_time);
 		        compound.setString("mother_name", this.getMotherName());
 		        compound.setString("father_name", this.getFatherName());
+		        compound.setString("tab", this.getTab());
 		        compound.setInteger("CareerLevel", this.careerLevel);
 		        if (!(this.getMotherId() == null))
 		        {
@@ -730,6 +743,7 @@ public class IvVillager extends EntityVillager{
 		 if (item_handler.getStackInSlot(0).getCount() >= this.getHireCost() && item_handler.getStackInSlot(0).getItem().equals(Items.EMERALD) && !this.getHired())
 		 {
 			 int remaining_i = item_handler.getStackInSlot(0).getCount() - this.getHireCost();
+			 this.villagerInventory.addItem(new ItemStack(Items.EMERALD, item_handler.getStackInSlot(0).getCount() - remaining_i));
 			 this.setHired(true);
 	         this.setOwnerId(player.getUniqueID());
 	         item_handler.setStackInSlot(0, new ItemStack(Items.EMERALD, remaining_i));
@@ -743,6 +757,43 @@ public class IvVillager extends EntityVillager{
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		 }
+	 }
+	 public void change_tab(int button, EntityPlayer player)
+	 {
+		 if (button == 0)
+		 {
+			this.setTab("Info");
+     		player.openGui(Iv.instance, GuiHandler.Info, world, getEntityId(), 0, 0);
+		 }
+		 else if (button == 1)
+		 {
+			this.setTab("Hire");
+     		player.openGui(Iv.instance, GuiHandler.Hire, world, getEntityId(), 0, 0);
+		 }
+		 else if (button == 2)
+		 {
+			this.setTab("Hauler");
+     		player.openGui(Iv.instance, GuiHandler.Hauler, world, getEntityId(), 0, 0);
+		 }
+		 else if (button == 3)
+		 {
+			this.setTab("Info");
+            if (this.buyingList == null)
+            {
+                this.populateBuyingList();
+            }
+
+            if (!this.world.isRemote && !this.buyingList.isEmpty())
+            {
+                this.setCustomer(player);
+                player.displayVillagerTradeGui(this);
+            }
+		 }
+		 else if (button == 4)
+		 {
+			 this.setTab("Inventory");
+	     	 player.openGui(Iv.instance, GuiHandler.Inventory, world, getEntityId(), 0, 0);
 		 }
 	 }
 	 public void change_following()
@@ -778,6 +829,7 @@ public class IvVillager extends EntityVillager{
 		 this.item_handler.deserializeNBT(compound.getCompoundTag("Villager_Inv"));
 		 this.setFatherName(compound.getString("father_name"));
 		 this.setMotherName(compound.getString("mother_name"));
+		 this.setTab(compound.getString("tab"));
 	     for (int b = 0; b < this.getNoteList().size(); b++)
 	     {
 	         this.addNoteList(compound.getUniqueId("UUID Note " + Integer.toString(b)));
@@ -947,6 +999,13 @@ public class IvVillager extends EntityVillager{
 	        		this.villageObj.modifyPlayerReputation(player.getName(), -2);
 	            }
         	}
+        	if (!this.world.isRemote && !(this.note_list == null))
+            {
+         	   for (int a = 0; a < this.getNoteList().size(); a++)
+         	   {
+         		   this.getNotePlayer(a).sendMessage(createChatComponent(this.getCustomNameTag() + " was robbed by " + player.getName()));
+         	   }
+            }
             return true;
         }
         else if (itemstack.getItem() == IvItems.notification_marker)
@@ -955,28 +1014,35 @@ public class IvVillager extends EntityVillager{
         	itemstack.damageItem(1, player);
         	return true;
         }
-        else if (!this.getHired() && this.getProfessionForge() == PROFESSION_NITWIT && !this.isChild())
+        else if (this.getTab().equals("Hire"))
         {
         	if (!world.isRemote) {
-        		player.openGui(Iv.instance, GuiHandler.Villager_Hire, world, getEntityId(), 0, 0);
+        		player.openGui(Iv.instance, GuiHandler.Hire, world, getEntityId(), 0, 0);
         	}
         	return true;
         }
-        else if (this.isChild())
+        else if (this.getTab() == "Info")
         {
         	if (!world.isRemote) {
         		player.openGui(Iv.instance, GuiHandler.Info, world, getEntityId(), 0, 0);
         		}
         	return true;
         }
-        else if (this.getHired() && this.getProfessionForge() == PROFESSION_NITWIT && !this.isChild())
+        else if (this.getTab().equals("Hauler"))
         {
         	if (!world.isRemote) {
         		player.openGui(Iv.instance, GuiHandler.Hauler, world, getEntityId(), 0, 0);
         		}
         	return true;
         }
-        else if (!this.holdingSpawnEggOfClass(itemstack, EntityVillager.class) && this.isEntityAlive() && !this.isTrading() && !this.isChild())
+        else if (this.getTab().equals("Inventory"))
+        {
+        	if (!world.isRemote) {
+        		player.openGui(Iv.instance, GuiHandler.Inventory, world, getEntityId(), 0, 0);
+        		}
+        	return true;
+        }
+        else if (!this.holdingSpawnEggOfClass(itemstack, EntityVillager.class) && this.isEntityAlive() && !this.isChild())
         {
             if (this.buyingList == null)
             {

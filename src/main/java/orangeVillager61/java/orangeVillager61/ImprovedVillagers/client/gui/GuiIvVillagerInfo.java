@@ -18,13 +18,13 @@ import orangeVillager61.ImprovedVillagers.Reference;
 import orangeVillager61.ImprovedVillagers.Blocks.IvBlocks;
 import orangeVillager61.ImprovedVillagers.Container.ContainerIvVillagerHireNitwit;
 import orangeVillager61.ImprovedVillagers.Entities.IvVillager;
+import orangeVillager61.ImprovedVillagers.Packet.MessageChangeTab;
 import orangeVillager61.ImprovedVillagers.Packet.MessageHireVillager;
 
 public class GuiIvVillagerInfo extends GuiContainer{
 
 	private IvVillager villager;
 	private IInventory playerInv;
-	protected int remaining_i = 0;
 	
 	public GuiIvVillagerInfo(IvVillager villager, IInventory playerInv) {
 		super(new ContainerIvVillagerHireNitwit(villager, playerInv));
@@ -42,6 +42,19 @@ public class GuiIvVillagerInfo extends GuiContainer{
 	{
 		super.initGui();
         this.addButton(new GuiButton(0, this.getGuiLeft(), this.getGuiTop(), 50, 20, "Info"));
+        this.addButton(new GuiButton(0, this.getGuiLeft() + 100, this.getGuiTop(), 50, 20, "Inventory"));
+        if (this.villager.getProfession() == 5 && this.villager.getHired())
+        {
+            this.addButton(new GuiButton(0, this.getGuiLeft() + 50, this.getGuiTop(), 50, 20, "Hauler"));
+        }
+        else if (this.villager.getProfession() == 5 && !this.villager.getHired())
+        {
+            this.addButton(new GuiButton(0, this.getGuiLeft() + 50, this.getGuiTop(), 50, 20, "Hire"));
+        }
+        if (!(this.villager.getProfession() == 5) && !this.villager.isChild())
+        {
+            this.addButton(new GuiButton(0, this.getGuiLeft() + 50, this.getGuiTop(), 50, 20, "Trade"));
+        }
 	}
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
@@ -53,7 +66,22 @@ public class GuiIvVillagerInfo extends GuiContainer{
 	@Override
     protected void actionPerformed(GuiButton button)
     {
-
+		if (button.displayString.equals("Hire"))
+		{
+	    	Reference.PACKET_MODID.sendToServer(new MessageChangeTab(this.villager.getEntityId(), 1));
+		}
+		else if (button.displayString.equals("Hauler"))
+		{
+	    	Reference.PACKET_MODID.sendToServer(new MessageChangeTab(this.villager.getEntityId(), 2));
+		}
+		else if (button.displayString.equals("Trade"))
+		{
+	    	Reference.PACKET_MODID.sendToServer(new MessageChangeTab(this.villager.getEntityId(), 3));
+		}
+		else if (button.displayString.equals("Inventory"))
+		{
+	    	Reference.PACKET_MODID.sendToServer(new MessageChangeTab(this.villager.getEntityId(), 4));
+		}
     }
 	
 	@Override
@@ -62,6 +90,11 @@ public class GuiIvVillagerInfo extends GuiContainer{
         String s = this.villager.getName();
         String health_amount = "";
         String g = "None";
+        String life_stage = this.villager.getAdultAge();
+        if (this.villager.isChild())
+        {
+        	life_stage = "Child";
+        }
         if (this.villager.getGender() == 1)
         {
         	g = "Male";
@@ -70,7 +103,7 @@ public class GuiIvVillagerInfo extends GuiContainer{
         	g = "Female";
         }
         this.mc.fontRenderer.drawString("Name: " + s, 12, 30, 4210752);
-        this.mc.fontRenderer.drawString("Life Stage: " + this.villager.getAdultAge(), 12, 48, 4210752);
+        this.mc.fontRenderer.drawString("Life Stage: " + life_stage, 12, 48, 4210752);
         this.mc.fontRenderer.drawString("Gender: " + g, 12, 66, 4210752);
         if (this.villager.getMaxHealth() * 0.75 <= this.villager.getHealth())
         {

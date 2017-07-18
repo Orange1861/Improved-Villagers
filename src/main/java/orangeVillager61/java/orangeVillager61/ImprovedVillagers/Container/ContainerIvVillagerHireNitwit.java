@@ -19,10 +19,11 @@ public class ContainerIvVillagerHireNitwit extends Container{
 		this.villager = villager;
 		this.handler = this.villager.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 
-		this.addSlotToContainer(new SlotItemHandler(handler, 0, 76, 47));
-		int xPos = 8;
-		int yPos = 84;
+		this.addSlotToContainer(new SlotItemHandler(handler, 0, 83, 83));
 		
+		int xPos = 8;
+		int yPos = 153;
+				
 		for (int y = 0; y < 3; ++y) {
 			for (int x = 0; x < 9; ++x) {
 				this.addSlotToContainer(new Slot(playerInv, x + y * 9 + 9, xPos + x * 18, yPos + y * 18));

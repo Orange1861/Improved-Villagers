@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.GlStateManager;
 import orangeVillager61.ImprovedVillagers.Entities.IvVillager;
 
+//This class is just to allow follow text changes
 public class ButtonFollow extends GuiButton{
 
 	IvVillager villager; 

@@ -1453,14 +1453,8 @@ public class VillageStructures
                         this.replaceAirAndLiquidDownwards(worldIn, iblockstate, i, -1, j, structureBoundingBoxIn);
                     }
                 }
-                if (Config.overwriteOriginalVillagers)
-                {
-                    this.spawnIvVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1, true, r.nextInt(6));
-                }
-                else
-                {
-                    this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1, true);
-                }
+                this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1, false);
+                this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1, true);
                 return true;
             }
         }

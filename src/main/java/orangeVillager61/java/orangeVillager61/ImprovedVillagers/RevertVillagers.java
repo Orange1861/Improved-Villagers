@@ -11,10 +11,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import orangeVillager61.ImprovedVillagers.Entities.IvVillager;
 
-
 public class RevertVillagers {
-	Random r = new Random();
-	
 	@SubscribeEvent
 	public void entityJoinedWorldEventHandler(EntityJoinWorldEvent event)
 	{

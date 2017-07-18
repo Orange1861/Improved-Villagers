@@ -12,6 +12,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.OreDictionary;
 import orangeVillager61.ImprovedVillagers.Packet.MessageChangeFollow;
 import orangeVillager61.ImprovedVillagers.Packet.MessageChangeFollowHandler;
+import orangeVillager61.ImprovedVillagers.Packet.MessageChangeTab;
+import orangeVillager61.ImprovedVillagers.Packet.MessageChangeTabHandler;
 import orangeVillager61.ImprovedVillagers.Packet.MessageHireVillager;
 import orangeVillager61.ImprovedVillagers.Packet.MessageHireVillagerHandler;
 
@@ -34,6 +36,8 @@ public class Iv {
 	   proxy.preInit(e);
 	   Reference.PACKET_MODID.registerMessage(MessageHireVillagerHandler.class, MessageHireVillager.class, 0, Side.SERVER);
 	   Reference.PACKET_MODID.registerMessage(MessageChangeFollowHandler.class, MessageChangeFollow.class, 1, Side.SERVER);
+	   Reference.PACKET_MODID.registerMessage(MessageChangeTabHandler.class, MessageChangeTab.class, 2, Side.SERVER);
+
 	}
 
 	@EventHandler
