@@ -13,9 +13,6 @@ import orangeVillager61.ImprovedVillagers.Blocks.IvBlocks;
 import orangeVillager61.ImprovedVillagers.Items.IvItems;
 
 public class IvRecipes {
-
-	public Random r = new Random();
-	
 	@SideOnly(Side.CLIENT)
 	 public static void applyEntityIdToItemStack(ItemStack stack, String entityId)
 	 {

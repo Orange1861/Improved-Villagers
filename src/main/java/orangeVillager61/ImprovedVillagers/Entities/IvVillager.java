@@ -33,8 +33,12 @@ import net.minecraft.entity.ai.EntityAITempt;
 import net.minecraft.entity.ai.EntityAITradePlayer;
 import net.minecraft.entity.ai.EntityAIVillagerInteract;
 import net.minecraft.entity.ai.EntityAIVillagerMate;
+import net.minecraft.entity.ai.EntityAIWanderAvoidWater;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.ai.EntityAIWatchClosest2;
+import net.minecraft.entity.monster.EntityEvoker;
+import net.minecraft.entity.monster.EntityVex;
+import net.minecraft.entity.monster.EntityVindicator;
 import net.minecraft.entity.monster.EntityZombie;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.passive.EntityVillager;
@@ -55,6 +59,9 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.village.MerchantRecipeList;
 import net.minecraft.village.Village;
 import net.minecraft.world.World;
@@ -78,6 +85,16 @@ import orangeVillager61.ImprovedVillagers.client.gui.GuiHandler;
 
 public class IvVillager extends EntityVillager{
 	
+	//TODO Convert the rest of this Villager from vanilla ints to forge profession
+	@ObjectHolder("minecraft:farmer")
+	public static VillagerProfession PROFESSION_FARMER = null;
+
+	@ObjectHolder("minecraft:nitwit")
+	public static VillagerProfession PROFESSION_NITWIT = null;
+	
+	@ObjectHolder("minecraft:priest")
+	public static VillagerProfession PROFESSION_PRIEST = null;
+	
 	protected Village villageObj; 
 	public String name;
 	//public int gender;
@@ -85,12 +102,11 @@ public class IvVillager extends EntityVillager{
     private ItemStackHandler item_handler = new ItemStackHandler(15);
     protected int wealth;
     public int robbed_time;
-    //public String Adult_Age;
-    //protected int int_Age;
     protected MerchantRecipeList buyingList;
     protected static final DataParameter<Optional<UUID>> OWNER_DEFINED_ID = EntityDataManager.<Optional<UUID>>createKey(IvVillager.class, DataSerializers.OPTIONAL_UNIQUE_ID);
     //TODO Turn Adult Age into an Enum
     private static final DataParameter<String> Adult_Age = EntityDataManager.<String>createKey(IvVillager.class, DataSerializers.STRING);
+    private static final DataParameter<String> Tab = EntityDataManager.<String>createKey(IvVillager.class, DataSerializers.STRING);
     private static final DataParameter<Integer> int_Age = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
     private static final DataParameter<Boolean> Is_Hired = EntityDataManager.<Boolean>createKey(IvVillager.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> has_init = EntityDataManager.<Boolean>createKey(IvVillager.class, DataSerializers.BOOLEAN);
@@ -110,7 +126,6 @@ public class IvVillager extends EntityVillager{
     private static final DataParameter<String> father_name = EntityDataManager.<String>createKey(IvVillager.class, DataSerializers.STRING);
     static Random r = new Random();
     protected ArrayList<UUID> note_list = new ArrayList<UUID>(0);
-    /** A multi-dimensional array mapping the various professions, careers and career levels that a Villager may offer */
 	public static final String[] en_male_list = {"Bob", "Joseph", "Aaron", "Philp", "Adam", "Paul", "Donald", "Ryan", 
 									"Mark", "Brian", "Robert", "Willam", "Harold", "Anthony", "Julius", 
 									"Mathew", "Tyler", "Noah", "Patrick", "Caden", "Michael", "Jeffery",
@@ -146,6 +161,9 @@ public class IvVillager extends EntityVillager{
         this.villagerInventory = new InventoryBasic("Items", false, 20);
         this.setVillagerAge();
 	    this.setHireCost(r.nextInt(21) + 20);
+	    this.setGender(r.nextInt(2) + 1);
+	    this.name = this.random_name(this.getGender());
+	    this.setCustomNameTag(this.name);
 	    this.robbed_time = 0;
 	}
 	public IvVillager(World world, int professionId, int gender, String name) {
@@ -170,9 +188,9 @@ public class IvVillager extends EntityVillager{
 	    this.setHireCost(r.nextInt(21) + 20);
 	    this.setFatherId(father_id);
 	    this.setMotherId(mother_id);
-		this.setFatherName(this.worldObj.getMinecraftServer().getEntityFromUuid(father_id).getCustomNameTag());
-		this.setMotherName(this.worldObj.getMinecraftServer().getEntityFromUuid(mother_id).getCustomNameTag());
-
+		this.setFatherName(this.world.getMinecraftServer().getEntityFromUuid(father_id).getCustomNameTag());
+		this.setMotherName(this.world.getMinecraftServer().getEntityFromUuid(mother_id).getCustomNameTag());
+	    this.robbed_time = 0;
 	}
 	public InventoryBasic getVillagerInventory()
     {
@@ -291,7 +309,7 @@ public class IvVillager extends EntityVillager{
         try
         {
             UUID uuid = this.getNoteList().get(num);
-            return uuid == null ? null : this.worldObj.getPlayerEntityByUUID(uuid);
+            return uuid == null ? null : this.world.getPlayerEntityByUUID(uuid);
         }
         catch (IllegalArgumentException var2)
         {
@@ -301,11 +319,11 @@ public class IvVillager extends EntityVillager{
 	@Override
 	public void onDeath(DamageSource cause)
     {
-       if (!this.worldObj.isRemote && this.worldObj.getGameRules().getBoolean("showDeathMessages") && (this.note_list == null) == false)
+       if (!this.world.isRemote && this.world.getGameRules().getBoolean("showDeathMessages") && !(this.note_list == null))
        {
     	   for (int a = 0; a < this.getNoteList().size(); a++)
     	   {
-    		   this.getNotePlayer(a).addChatMessage(this.getCombatTracker().getDeathMessage());
+    		   this.getNotePlayer(a).sendMessage(this.getCombatTracker().getDeathMessage());
     	   }
        }
        if (this.getHired())
@@ -315,6 +333,10 @@ public class IvVillager extends EntityVillager{
     	       this.entityDropItem(this.item_handler.getStackInSlot(s), 0);
     	   }
        }
+       for (int i = 0; i < 20; i++)
+       {
+    	   this.entityDropItem(this.villagerInventory.getStackInSlot(i), 0);
+       }
        super.onDeath(cause);
     }
     @Nullable
@@ -323,7 +345,7 @@ public class IvVillager extends EntityVillager{
         try
         {
             UUID uuid = this.getOwnerId();
-            return uuid == null ? null : this.worldObj.getPlayerEntityByUUID(uuid);
+            return uuid == null ? null : this.world.getPlayerEntityByUUID(uuid);
         }
         catch (IllegalArgumentException var2)
         {
@@ -357,6 +379,7 @@ public class IvVillager extends EntityVillager{
 		this.getDataManager().register(Father_ID, Optional.<UUID>absent());
 		this.getDataManager().register(int_Age, Integer.valueOf(1));
 		this.getDataManager().register(Adult_Age, String.valueOf(""));
+		this.getDataManager().register(Tab, String.valueOf("Info"));
 		this.getDataManager().register(mother_name, String.valueOf(""));
 		this.getDataManager().register(father_name, String.valueOf(""));
 		this.getDataManager().register(Is_Hired, Boolean.valueOf(false));
@@ -406,8 +429,8 @@ public class IvVillager extends EntityVillager{
 	    int Gender;
 	    Gender = r.nextInt(2) + 1;
 	    Name = this.random_name(Gender);
-        IvVillager IvVillager = new IvVillager(this.worldObj, r.nextInt(6), Gender, Name, Father_Id, Mother_Id);
-        IvVillager.onInitialSpawn(this.worldObj.getDifficultyForLocation(new BlockPos(IvVillager)), (IEntityLivingData)null);
+        IvVillager IvVillager = new IvVillager(this.world, r.nextInt(6), Gender, Name, Father_Id, Mother_Id);
+        IvVillager.onInitialSpawn(this.world.getDifficultyForLocation(new BlockPos(IvVillager)), (IEntityLivingData)null);
         return IvVillager;
     }
 	protected void setAdultAge(String name)
@@ -417,6 +440,10 @@ public class IvVillager extends EntityVillager{
 	protected void setMotherName(String name)
     {
         this.dataManager.set(mother_name, name);
+    }
+	protected void setTab(String name)
+    {
+        this.dataManager.set(Tab, name);
     }
 	protected void setFatherName(String name)
     {
@@ -494,6 +521,10 @@ public class IvVillager extends EntityVillager{
     {
         return (String)this.dataManager.get(Adult_Age);
     }
+    public String getTab()
+    {
+        return (String)this.dataManager.get(Tab);
+    }
     public String getFatherName()
     {
         return (String)this.dataManager.get(father_name);
@@ -524,16 +555,18 @@ public class IvVillager extends EntityVillager{
         }
 	}
 	public void ivVillagerAdultAge(int lifeChangeNum){
-		if (worldObj.isRemote == false){
+		if (world.isRemote == false){
         	if (this.isChild() == false){
         		if (this.getIntAge() >= lifeChangeNum){
         			if (this.getAdultAge().equals("Young Adult")){
         	        	this.setIntAge(1);
         				this.setAdultAge("Middle Aged");
+        	        	this.setMoreVillagerNbtStuff();
         			}
         			else if (this.getAdultAge().equals("Middle Aged")){
         	        	this.setIntAge(1);
         				this.setAdultAge("Elder");
+        	        	this.setMoreVillagerNbtStuff();
         			}
         			else if (this.getAdultAge().equals("Elder")){
         				this.setIntAge(this.getIntAge() - (2500 * Config.adult_days));
@@ -542,6 +575,13 @@ public class IvVillager extends EntityVillager{
             				this.damageEntity(Iv.dmgOldAge, 22);
         				}
         			}
+    	            if (!this.world.isRemote && !(this.note_list == null))
+    	            {
+    	         	   for (int a = 0; a < this.getNoteList().size(); a++)
+    	         	   {
+    	         		   this.getNotePlayer(a).sendMessage(createChatComponent(this.getCustomNameTag() + " has aged to an " + this.getAdultAge()));
+    	         	   }
+    	            }
         		}
         		else{
         				this.setIntAge(this.getIntAge() + 1);
@@ -549,6 +589,9 @@ public class IvVillager extends EntityVillager{
         			
         	}
         }
+	}
+	public static ITextComponent createChatComponent(String message) {
+        return new TextComponentTranslation(message);
 	}
 	@Override
 	public void onLivingUpdate()
@@ -559,7 +602,7 @@ public class IvVillager extends EntityVillager{
 	        {
 	        	this.robbed_time -= 1;
 	        }
-	        //this.setMoreVillagerNbtStuff();
+	        this.setMoreVillagerNbtStuff();
 	    }
 	@Override
 	protected void onGrowingAdult()
@@ -567,16 +610,27 @@ public class IvVillager extends EntityVillager{
         super.onGrowingAdult();
         this.setAdultAge("Young Adult");
     	this.setIntAge(1);
+        if (!this.world.isRemote && !(this.note_list == null))
+        {
+     	   for (int a = 0; a < this.getNoteList().size(); a++)
+     	   {
+     		   this.getNotePlayer(a).sendMessage(createChatComponent(this.getCustomNameTag() + " has aged to an " + this.getAdultAge()));
+     	   }
+        }
+    	this.setMoreVillagerNbtStuff();
     }
 	@Override
 	protected void initEntityAI()
     {
-		if (worldObj.isRemote == false){
+		if (world.isRemote == false){
 			BlockPos blockpos = new BlockPos(this);
-			this.villageObj = this.worldObj.getVillageCollection().getNearestVillage(blockpos, 32);
+			this.villageObj = this.world.getVillageCollection().getNearestVillage(blockpos, 32);
 	        this.tasks.addTask(0, new EntityAISwimming(this));
 	        this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityZombie.class, 8.0F, 0.6D, 0.6D));
 	        //this.tasks.addTask(1, new VillagerAvoidEvilPlayer(this, 8.0F, 0.6D, 0.6D, this.villageObj));
+	        this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityEvoker.class, 12.0F, 0.8D, 0.8D));
+	        this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityVindicator.class, 8.0F, 0.8D, 0.8D));
+	        this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityVex.class, 8.0F, 0.6D, 0.6D));
 	        this.tasks.addTask(1, new EntityAIPanic(this, 0.8D));
 	        this.tasks.addTask(2, new VillagerAIFollowParent(this, 0.8D));
 	        this.tasks.addTask(1, new EntityAITradePlayer(this));
@@ -590,6 +644,7 @@ public class IvVillager extends EntityVillager{
 	        this.tasks.addTask(5, new IvVilsPerDoor(this));
 	        this.tasks.addTask(7, new EntityAIFollowGolem(this));
 	        this.tasks.addTask(9, new EntityAIVillagerInteract(this));
+	        this.tasks.addTask(9, new EntityAIWanderAvoidWater(this, 0.6D));
 	        this.tasks.addTask(10, new EntityAIWatchClosest2(this, EntityPlayer.class, 3.0F, 1.0F));
 	        this.tasks.addTask(10, new EntityAIWatchClosest(this, EntityLiving.class, 8.0F));
 		}
@@ -604,7 +659,7 @@ public class IvVillager extends EntityVillager{
             {
                 this.tasks.addTask(8, new EntityAIPlay(this, 0.32D));
             }
-            else if (this.getProfession() == 0)
+            else if (this.getProfessionForge() == PROFESSION_FARMER || this.getProfession() == 0)
             {
                 this.tasks.addTask(6, new EntityAIHarvestFarmland(this, 0.6D));
             }
@@ -631,6 +686,7 @@ public class IvVillager extends EntityVillager{
 		        compound.setInteger("Robbed_Time", this.robbed_time);
 		        compound.setString("mother_name", this.getMotherName());
 		        compound.setString("father_name", this.getFatherName());
+		        compound.setString("tab", this.getTab());
 		        compound.setInteger("CareerLevel", this.careerLevel);
 		        if (!(this.getMotherId() == null))
 		        {
@@ -670,7 +726,7 @@ public class IvVillager extends EntityVillager{
 	        {
 	            ItemStack itemstack = this.villagerInventory.getStackInSlot(i);
 
-	            if (!(itemstack == null))
+	            if (!itemstack.isEmpty())
 	            {
 	                nbttaglist.appendTag(itemstack.writeToNBT(new NBTTagCompound()));
 	            }
@@ -684,14 +740,15 @@ public class IvVillager extends EntityVillager{
 	 {
 		 Exception HiringAlreadyHiredVillager = new Exception("Tried to hire an already hired villager");
 
-		 if (item_handler.getStackInSlot(0).stackSize >= this.getHireCost() && item_handler.getStackInSlot(0).getItem().equals(Items.EMERALD) && !this.getHired())
+		 if (item_handler.getStackInSlot(0).getCount() >= this.getHireCost() && item_handler.getStackInSlot(0).getItem().equals(Items.EMERALD) && !this.getHired())
 		 {
-			 int remaining_i = item_handler.getStackInSlot(0).stackSize - this.getHireCost();
+			 int remaining_i = item_handler.getStackInSlot(0).getCount() - this.getHireCost();
+			 this.villagerInventory.addItem(new ItemStack(Items.EMERALD, item_handler.getStackInSlot(0).getCount() - remaining_i));
 			 this.setHired(true);
 	         this.setOwnerId(player.getUniqueID());
 	         item_handler.setStackInSlot(0, new ItemStack(Items.EMERALD, remaining_i));
              this.tasks.addTask(6, new VillagerFollowOwner(this, 0.9D, 6.0F, 1.5F));
-     		 player.openGui(Iv.instance, GuiHandler.Hauler, this.worldObj, getEntityId(), 0, 0);
+     		 player.openGui(Iv.instance, GuiHandler.Hauler, this.world, getEntityId(), 0, 0);
 		 }
 		 else if (this.getHired())
 		 {
@@ -700,6 +757,43 @@ public class IvVillager extends EntityVillager{
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		 }
+	 }
+	 public void change_tab(int button, EntityPlayer player)
+	 {
+		 if (button == 0)
+		 {
+			this.setTab("Info");
+     		player.openGui(Iv.instance, GuiHandler.Info, world, getEntityId(), 0, 0);
+		 }
+		 else if (button == 1)
+		 {
+			this.setTab("Hire");
+     		player.openGui(Iv.instance, GuiHandler.Hire, world, getEntityId(), 0, 0);
+		 }
+		 else if (button == 2)
+		 {
+			this.setTab("Hauler");
+     		player.openGui(Iv.instance, GuiHandler.Hauler, world, getEntityId(), 0, 0);
+		 }
+		 else if (button == 3)
+		 {
+			this.setTab("Info");
+            if (this.buyingList == null)
+            {
+                this.populateBuyingList();
+            }
+
+            if (!this.world.isRemote && !this.buyingList.isEmpty())
+            {
+                this.setCustomer(player);
+                player.displayVillagerTradeGui(this);
+            }
+		 }
+		 else if (button == 4)
+		 {
+			 this.setTab("Inventory");
+	     	 player.openGui(Iv.instance, GuiHandler.Inventory, world, getEntityId(), 0, 0);
 		 }
 	 }
 	 public void change_following()
@@ -725,7 +819,7 @@ public class IvVillager extends EntityVillager{
 	 public void readEntityFromNBT(NBTTagCompound compound){
 		 super.readEntityFromNBT(compound);
 	     String s;
-		 if (worldObj.isRemote == false){
+		 if (world.isRemote == false){
 			 if (compound.hasKey("Gender"))
 			 {
 				 this.setGender(compound.getInteger("Gender"));
@@ -735,6 +829,7 @@ public class IvVillager extends EntityVillager{
 		 this.item_handler.deserializeNBT(compound.getCompoundTag("Villager_Inv"));
 		 this.setFatherName(compound.getString("father_name"));
 		 this.setMotherName(compound.getString("mother_name"));
+		 this.setTab(compound.getString("tab"));
 	     for (int b = 0; b < this.getNoteList().size(); b++)
 	     {
 	         this.addNoteList(compound.getUniqueId("UUID Note " + Integer.toString(b)));
@@ -825,9 +920,9 @@ public class IvVillager extends EntityVillager{
 
 	        for (int i = 0; i < nbttaglist.tagCount(); ++i)
 	        {
-	            ItemStack itemstack = ItemStack.loadItemStackFromNBT(nbttaglist.getCompoundTagAt(i));
+	            ItemStack itemstack = new ItemStack(nbttaglist.getCompoundTagAt(i));
 
-	            if (!(itemstack == null))
+	            if (!itemstack.isEmpty())
 	            {
 	                this.villagerInventory.addItem(itemstack);
 	            }
@@ -864,106 +959,116 @@ public class IvVillager extends EntityVillager{
 	        {
 	            for (EntityVillager.ITradeList entityvillager$itradelist : trades)
 	            {
-	                entityvillager$itradelist.modifyMerchantRecipeList(this.buyingList, this.rand);
+	                entityvillager$itradelist.addMerchantRecipe(this, this.buyingList, this.rand);
 	            }
 	        }
 	    }
 	 @Override
-	 public boolean processInteract(EntityPlayer player, EnumHand hand, @Nullable ItemStack stack){
-		if (worldObj.isRemote == false){
+	 public boolean processInteract(EntityPlayer player, EnumHand hand){
+		if (world.isRemote == false){
 			BlockPos blockpos = new BlockPos(this);
-			this.villageObj = this.worldObj.getVillageCollection().getNearestVillage(blockpos, 32);
+			this.villageObj = this.world.getVillageCollection().getNearestVillage(blockpos, 32);
 
 		}
-        if (stack != null)
-        {
-	        	
-		        ItemStack itemstack = stack;
-		        if (itemstack.getItem() == IvItems.thieving_nose && !this.isChild() && this.robbed_time == 0){
-		        	itemstack.damageItem(1, player);
-		        	this.setHealth(this.getHealth() - 2);
-		        	this.playHurtSound(getLastDamageSource());
-		        	int randy = rand.nextInt(10) + 1 ;
-		        	if (randy < 6){
-		        		
-		        	}
-		        	if (randy < 9 && randy  > 5){
-		        		this.entityDropItem(new ItemStack(Items.EMERALD, r.nextInt(2) + 1), 0);
-		        		if (rand.nextInt(2) == 0)
-		        		{
-		        			this.robbed_time = 1200;
-		        		}
-		        	}
-		        	if (randy < 10 && randy + 1  > 8){
-		        		this.entityDropItem(new ItemStack(Items.EMERALD, r.nextInt(5) + 1), 0);
-		        		if (rand.nextInt(2) == 0)
-		        		{
-		        			this.robbed_time = 1200;
-		        		}
-		        	}
-		        	if (worldObj.isRemote == false){
-		        	if (this.villageObj != null)
-			            {
-			        		this.villageObj.modifyPlayerReputation(player.getName(), -2);
-			            }
-		        	}
-		            return true;
-		        }
-		        else if (itemstack.getItem() == IvItems.notification_marker)
-		        {
-		        	this.addNoteList(player.getUniqueID(), itemstack, player);
-		        	itemstack.damageItem(1, player);
-		        	return true;
-		        }
+        ItemStack itemstack = player.getHeldItem(hand);
+        if (itemstack.getItem() == IvItems.thieving_nose && !this.isChild() && this.robbed_time == 0){
+        	itemstack.damageItem(1, player);
+        	this.setHealth(this.getHealth() - 2);
+        	this.playHurtSound(getLastDamageSource());
+        	int randy = rand.nextInt(10) + 1 ;
+        	if (randy < 6){
+        		
         	}
-	        if (!this.getHired() && this.getProfession() == 5 && !this.isChild())
-	        {
-	        	if (!worldObj.isRemote) {
-	        		player.openGui(Iv.instance, GuiHandler.Villager_Hire, worldObj, getEntityId(), 0, 0);
-	        	}
-	        	return true;
-	        }
-	        else if (this.isChild())
-	        {
-	        	if (!worldObj.isRemote) {
-	        		player.openGui(Iv.instance, GuiHandler.Info, worldObj, getEntityId(), 0, 0);
-	        		}
-	        	return true;
-	        }
-	        else if (this.getHired() && this.getProfession() == 5 && !this.isChild())
-	        {
-	        	if (!worldObj.isRemote) {
-	        		player.openGui(Iv.instance, GuiHandler.Hauler, worldObj, getEntityId(), 0, 0);
-	        		}
-	        	return true;
-	        }
-	        else if (this.isEntityAlive() && !this.isTrading() && !this.isChild())
-	        {
-	            if (this.buyingList == null)
+        	if (randy < 9 && randy  > 5){
+        		this.entityDropItem(new ItemStack(Items.EMERALD, r.nextInt(2) + 1), 0);
+        		if (rand.nextInt(2) == 0)
+        		{
+        			this.robbed_time = 1200;
+        		}
+        	}
+        	if (randy < 10 && randy + 1  > 8){
+        		this.entityDropItem(new ItemStack(Items.EMERALD, r.nextInt(5) + 1), 0);
+        		if (rand.nextInt(2) == 0)
+        		{
+        			this.robbed_time = 1200;
+        		}
+        	}
+        	if (world.isRemote == false){
+        	if (this.villageObj != null)
 	            {
-	                this.populateBuyingList();
+	        		this.villageObj.modifyPlayerReputation(player.getName(), -2);
 	            }
-	
-	            if (hand == EnumHand.MAIN_HAND)
-	            {
-	                player.addStat(StatList.TALKED_TO_VILLAGER);
-	            }
-	
-	            if (!this.worldObj.isRemote && !this.buyingList.isEmpty())
-	            {
-	                this.setCustomer(player);
-	                player.displayVillagerTradeGui(this);
-	            }
-	            else if (this.buyingList.isEmpty())
-	            {
-	                return super.processInteract(player, hand, stack);
-	            }
-	
-	            return true;
+        	}
+        	if (!this.world.isRemote && !(this.note_list == null))
+            {
+         	   for (int a = 0; a < this.getNoteList().size(); a++)
+         	   {
+         		   this.getNotePlayer(a).sendMessage(createChatComponent(this.getCustomNameTag() + " was robbed by " + player.getName()));
+         	   }
+            }
+            return true;
+        }
+        else if (itemstack.getItem() == IvItems.notification_marker)
+        {
+        	this.addNoteList(player.getUniqueID(), itemstack, player);
+        	itemstack.damageItem(1, player);
+        	return true;
+        }
+        else if (this.getTab().equals("Hire"))
+        {
+        	if (!world.isRemote) {
+        		player.openGui(Iv.instance, GuiHandler.Hire, world, getEntityId(), 0, 0);
+        	}
+        	return true;
+        }
+        else if (this.getTab() == "Info")
+        {
+        	if (!world.isRemote) {
+        		player.openGui(Iv.instance, GuiHandler.Info, world, getEntityId(), 0, 0);
+        		}
+        	return true;
+        }
+        else if (this.getTab().equals("Hauler"))
+        {
+        	if (!world.isRemote) {
+        		player.openGui(Iv.instance, GuiHandler.Hauler, world, getEntityId(), 0, 0);
+        		}
+        	return true;
+        }
+        else if (this.getTab().equals("Inventory"))
+        {
+        	if (!world.isRemote) {
+        		player.openGui(Iv.instance, GuiHandler.Inventory, world, getEntityId(), 0, 0);
+        		}
+        	return true;
+        }
+        else if (!this.holdingSpawnEggOfClass(itemstack, EntityVillager.class) && this.isEntityAlive() && !this.isChild())
+        {
+            if (this.buyingList == null)
+            {
+                this.populateBuyingList();
+            }
+
+            if (hand == EnumHand.MAIN_HAND)
+            {
+                player.addStat(StatList.TALKED_TO_VILLAGER);
+            }
+
+            if (!this.world.isRemote && !this.buyingList.isEmpty())
+            {
+                this.setCustomer(player);
+                player.displayVillagerTradeGui(this);
+            }
+            else if (this.buyingList.isEmpty())
+            {
+                return super.processInteract(player, hand);
+            }
+
+            return true;
         }
         else
         {
-            return super.processInteract(player, hand, stack);
+            return super.processInteract(player, hand);
         }
     }
 

@@ -1453,14 +1453,8 @@ public class VillageStructures
                         this.replaceAirAndLiquidDownwards(worldIn, iblockstate, i, -1, j, structureBoundingBoxIn);
                     }
                 }
-                if (Config.overwriteOriginalVillagers)
-                {
-                    this.spawnIvVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1, true, r.nextInt(6));
-                }
-                else
-                {
-                    this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1, true);
-                }
+                this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1, false);
+                this.spawnVillagers(worldIn, structureBoundingBoxIn, 1, 1, 2, 1, true);
                 return true;
             }
         }
@@ -2090,18 +2084,18 @@ public class VillageStructures
 			            {
 			            	if (allow_children)
 			            	{
-			            		int Gender;
-				    		    Gender = r.nextInt(2) + 1;
-				    	        String Name = IvVillager.random_name(Gender);
-				                IvVillager entityvillager = new IvVillager(worldIn, prof, Gender, Name);
-				                entityvillager.setLocationAndAngles((double)j + 0.5D, (double)k, (double)l + 0.5D, 0.0F, 0.0F);
-				                entityvillager.setProfession(this.chooseForgeProfession(i, entityvillager.getProfessionForge()));
-				                entityvillager.finalizeMobSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityvillager)), (IEntityLivingData)null, false);
-				                worldIn.spawnEntity(entityvillager);
 				                if (r.nextInt(3) == 0)
 				                {
+				            		int Gender;
+					    		    Gender = 1;
+					    	        String Name = IvVillager.random_name(Gender);
+					                IvVillager entityvillager = new IvVillager(worldIn, prof, Gender, Name);
+					                entityvillager.setLocationAndAngles((double)j + 0.5D, (double)k, (double)l + 0.5D, 0.0F, 0.0F);
+					                entityvillager.setProfession(this.chooseForgeProfession(i, entityvillager.getProfessionForge()));
+					                entityvillager.finalizeMobSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityvillager)), (IEntityLivingData)null, false);
+					                worldIn.spawnEntity(entityvillager);
 				                	UUID father_id = entityvillager.getUniqueID();
-				                	Gender = r.nextInt(2) + 1;
+				                	Gender = 2;
 					    	        Name = IvVillager.random_name(Gender);
 					                IvVillager entityvillager2 = new IvVillager(worldIn, prof, Gender, Name);
 					                entityvillager2.setLocationAndAngles((double)j + 0.5D, (double)k, (double)l + 0.5D, 0.0F, 0.0F);
@@ -2112,21 +2106,24 @@ public class VillageStructures
 					    		    Gender = r.nextInt(2) + 1;
 					    	        Name = IvVillager.random_name(Gender);
 					                IvVillager entityvillager3 = new IvVillager(worldIn, prof, Gender, Name, father_id, mother_id);
-					                entityvillager3.setGrowingAge(-23000);
+					                entityvillager3.setGrowingAge((r.nextInt(23999) + 1) * -1);
 					                entityvillager3.setLocationAndAngles((double)j + 0.5D, (double)k, (double)l + 0.5D, 0.0F, 0.0F);
 					                entityvillager3.setProfession(this.chooseForgeProfession(i, entityvillager.getProfessionForge()));
 					                entityvillager3.finalizeMobSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityvillager3)), (IEntityLivingData)null, false);
 					                worldIn.spawnEntity(entityvillager3);
 				                }
 			            	}
-			            	int Gender;
-			    		    Gender = r.nextInt(2) + 1;
-			    	        String Name = IvVillager.random_name(Gender);
-			                IvVillager entityvillager = new IvVillager(worldIn, prof, Gender, Name);
-			                entityvillager.setLocationAndAngles((double)j + 0.5D, (double)k, (double)l + 0.5D, 0.0F, 0.0F);
-			                entityvillager.setProfession(this.chooseForgeProfession(i, entityvillager.getProfessionForge()));
-			                entityvillager.finalizeMobSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityvillager)), (IEntityLivingData)null, false);
-			                worldIn.spawnEntity(entityvillager);
+			            	else
+			            	{
+				            	int Gender;
+				    		    Gender = r.nextInt(2) + 1;
+				    	        String Name = IvVillager.random_name(Gender);
+				                IvVillager entityvillager = new IvVillager(worldIn, prof, Gender, Name);
+				                entityvillager.setLocationAndAngles((double)j + 0.5D, (double)k, (double)l + 0.5D, 0.0F, 0.0F);
+				                entityvillager.setProfession(this.chooseForgeProfession(i, entityvillager.getProfessionForge()));
+				                entityvillager.finalizeMobSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityvillager)), (IEntityLivingData)null, false);
+				                worldIn.spawnEntity(entityvillager);
+			            	}
 			            }
 			        }
 			    }

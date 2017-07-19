@@ -8,6 +8,7 @@ public class Config {
 	public static boolean MateAgain;
 	public static int twins;
 	public static boolean enableDrops;
+	public static boolean enableVillages;
 	public static int VillageDistance;
 	public static boolean overwriteOriginalVillagers;
 	public static boolean enableIvTexture;
@@ -29,6 +30,7 @@ public class Config {
 	enableDrops = config.getBoolean("Enable Villager Drops", Configuration.CATEGORY_GENERAL, true, "If this is set to true, villager drops will be enabled.");
 	overwriteOriginalVillagers = config.getBoolean("Override Original Villagers?", Configuration.CATEGORY_GENERAL, true, "If this is set to true, then villagers will be overridden by the mod.");
 	revertVillagers = config.getBoolean("Revert Back to Original Villagers", Configuration.CATEGORY_GENERAL, false, "If this is set to true, then villagers will be converted back to vanilla villagers. This setting will be considered more important then the override.");
+	enableVillages = config.getBoolean("Enable Villages", Configuration.CATEGORY_GENERAL, true, "If this is set to true, this mod's villages will be enabled. Disabling this should fix village incompatibilities with other mods");
 	VillageDistance = config.getInt("Village Distance", Configuration.CATEGORY_GENERAL, 24, 2, 1024, "For each of this number of blocks, a village will try to spawn, Unmodded:32. This is will not do anything if Enable Villages is set to false");
 	enable_Metro = config.getBoolean("Enable Cities", Configuration.CATEGORY_GENERAL, true, "If this is set to true, then there will be a 1/20 chance of cities (massive villages) will spawn. May be buggy");
 	use_spanish = config.getBoolean("Use_Spanish", Configuration.CATEGORY_GENERAL, false, "If this is set to true, then villagers will be named with Hispanic names.");

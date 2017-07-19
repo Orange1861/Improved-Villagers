@@ -8,18 +8,20 @@ import net.minecraftforge.fml.common.network.IGuiHandler;
 import orangeVillager61.ImprovedVillagers.Container.ContainerIvVillagerHauler;
 import orangeVillager61.ImprovedVillagers.Container.ContainerIvVillagerHireNitwit;
 import orangeVillager61.ImprovedVillagers.Container.ContainerIvVillagerInfo;
+import orangeVillager61.ImprovedVillagers.Container.ContainerIvVillagerInventory;
 import orangeVillager61.ImprovedVillagers.Entities.IvVillager;
 
 public class GuiHandler implements IGuiHandler{
 
-	public static final int Villager_Hire = 0;
+	public static final int Hire = 0;
 	public static final int Hauler = 1;
 	public static final int Info = 2;
+	public static final int Inventory = 3;
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		// x is used as the entity ID for entity-based GUIs, suggested by Choonster
-		if (ID == Villager_Hire){
+		if (ID == Hire){
 			return new ContainerIvVillagerHireNitwit((IvVillager) world.getEntityByID(x), player.inventory);
 		}
 		else if (ID == Hauler){
@@ -29,6 +31,10 @@ public class GuiHandler implements IGuiHandler{
 		{
 			return new ContainerIvVillagerInfo((IvVillager) world.getEntityByID(x), player.inventory);		
 		}
+		else if (ID == Inventory)
+		{
+			return new ContainerIvVillagerInventory((IvVillager) world.getEntityByID(x), player.inventory);		
+		}
 		else {
 			return null;
 		}
@@ -37,7 +43,7 @@ public class GuiHandler implements IGuiHandler{
 	@Override
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		// x is used as the entity ID for entity-based GUIs, suggested by Choonster
-		if (ID == Villager_Hire)
+		if (ID == Hire)
 		{
 			return new GuiIvVillagerHireNitwit((IvVillager) world.getEntityByID(x), player.inventory, player);
 		}
@@ -46,6 +52,9 @@ public class GuiHandler implements IGuiHandler{
 		}
 		else if (ID == Info){
 			return new GuiIvVillagerInfo((IvVillager) world.getEntityByID(x), player.inventory);
+		}
+		else if (ID == Inventory){
+			return new GuiIvVillagerInventory((IvVillager) world.getEntityByID(x), player.inventory);
 		}
 		else {
 			return null;

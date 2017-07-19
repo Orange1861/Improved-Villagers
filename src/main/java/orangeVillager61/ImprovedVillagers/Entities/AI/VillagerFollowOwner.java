@@ -29,7 +29,7 @@ public class VillagerFollowOwner extends EntityAIBase
     public VillagerFollowOwner(IvVillager villager, double followSpeedIn, float minDistIn, float maxDistIn)
     {
         this.villager = villager;
-        this.world = villager.getEntityWorld();
+        this.world = villager.getWorld();
         this.followSpeed = followSpeedIn;
         this.petPathfinder = villager.getNavigator();
         this.minDist = minDistIn;
@@ -125,9 +125,9 @@ public class VillagerFollowOwner extends EntityAIBase
                     {
                         if (this.villager.getDistanceSqToEntity(this.theOwner) >= 144.0D)
                         {
-                            int i = MathHelper.absFloor(this.theOwner.posX) - 2;
-                            int j = MathHelper.absFloor(this.theOwner.posZ) - 2;
-                            int k = MathHelper.absFloor(this.theOwner.getEntityBoundingBox().minY);
+                            int i = MathHelper.floor(this.theOwner.posX) - 2;
+                            int j = MathHelper.floor(this.theOwner.posZ) - 2;
+                            int k = MathHelper.floor(this.theOwner.getEntityBoundingBox().minY);
 
                             for (int l = 0; l <= 4; ++l)
                             {

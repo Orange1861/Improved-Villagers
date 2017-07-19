@@ -64,14 +64,14 @@ public class VillagerAvoidEvilPlayer<T extends Entity> extends EntityAIBase
      */
     public boolean shouldExecute()
     {
-        List<EntityPlayer> list = this.theEntity.worldObj.<EntityPlayer>getEntitiesWithinAABB(this.classToAvoid, this.theEntity.getEntityBoundingBox().expand((double)this.avoidDistance, 3.0D, (double)this.avoidDistance), Predicates.and(new Predicate[] {EntitySelectors.CAN_AI_TARGET, this.canBeSeenSelector, this.avoidTargetSelector})); 
+        List<EntityPlayer> list = this.theEntity.world.<EntityPlayer>getEntitiesWithinAABB(this.classToAvoid, this.theEntity.getEntityBoundingBox().expand((double)this.avoidDistance, 3.0D, (double)this.avoidDistance), Predicates.and(new Predicate[] {EntitySelectors.CAN_AI_TARGET, this.canBeSeenSelector, this.avoidTargetSelector})); 
     	if (list.isEmpty())
         {
             return false;
         }
         else
         {
-        	if (this.theEntity.worldObj.isRemote == false){
+        	if (this.theEntity.world.isRemote == false){
             System.out.println(this.villageObj.getPlayerReputation(this.classToAvoid.getName()));
         	if (this.villageObj.getPlayerReputation(this.classToAvoid.getName()) < -8){ 
             this.closestLivingEntity = list.get(0);

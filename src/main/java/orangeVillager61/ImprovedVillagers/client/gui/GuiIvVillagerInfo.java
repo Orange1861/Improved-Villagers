@@ -18,14 +18,13 @@ import orangeVillager61.ImprovedVillagers.Reference;
 import orangeVillager61.ImprovedVillagers.Blocks.IvBlocks;
 import orangeVillager61.ImprovedVillagers.Container.ContainerIvVillagerHireNitwit;
 import orangeVillager61.ImprovedVillagers.Entities.IvVillager;
+import orangeVillager61.ImprovedVillagers.Packet.MessageChangeTab;
 import orangeVillager61.ImprovedVillagers.Packet.MessageHireVillager;
 
 public class GuiIvVillagerInfo extends GuiContainer{
 
 	private IvVillager villager;
 	private IInventory playerInv;
-	private EntityPlayer player;
-	protected int remaining_i = 0;
 	
 	public GuiIvVillagerInfo(IvVillager villager, IInventory playerInv) {
 		super(new ContainerIvVillagerHireNitwit(villager, playerInv));
@@ -42,19 +41,47 @@ public class GuiIvVillagerInfo extends GuiContainer{
 	public void initGui()
 	{
 		super.initGui();
-        this.addButton(new GuiButton(0, this.guiLeft, this.guiTop, 50, 20, "Info"));
+        this.addButton(new GuiButton(0, this.getGuiLeft(), this.getGuiTop(), 50, 20, "Info"));
+        this.addButton(new GuiButton(0, this.getGuiLeft() + 100, this.getGuiTop(), 50, 20, "Inventory"));
+        if (this.villager.getProfession() == 5 && this.villager.getHired())
+        {
+            this.addButton(new GuiButton(0, this.getGuiLeft() + 50, this.getGuiTop(), 50, 20, "Hauler"));
+        }
+        else if (this.villager.getProfession() == 5 && !this.villager.getHired())
+        {
+            this.addButton(new GuiButton(0, this.getGuiLeft() + 50, this.getGuiTop(), 50, 20, "Hire"));
+        }
+        if (!(this.villager.getProfession() == 5) && !this.villager.isChild())
+        {
+            this.addButton(new GuiButton(0, this.getGuiLeft() + 50, this.getGuiTop(), 50, 20, "Trade"));
+        }
 	}
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
 		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		this.mc.getTextureManager().bindTexture(new ResourceLocation(Reference.MOD_ID, "gui/info_gui.png"));
-		this.drawTexturedModalRect(this.guiLeft, this.guiTop, 0, 0, this.xSize, this.ySize);
+		this.drawTexturedModalRect(this.getGuiLeft(), this.getGuiTop(), 0, 0, this.xSize, this.ySize);
 	}
 	
 	@Override
     protected void actionPerformed(GuiButton button)
     {
-
+		if (button.displayString.equals("Hire"))
+		{
+	    	Reference.PACKET_MODID.sendToServer(new MessageChangeTab(this.villager.getEntityId(), 1));
+		}
+		else if (button.displayString.equals("Hauler"))
+		{
+	    	Reference.PACKET_MODID.sendToServer(new MessageChangeTab(this.villager.getEntityId(), 2));
+		}
+		else if (button.displayString.equals("Trade"))
+		{
+	    	Reference.PACKET_MODID.sendToServer(new MessageChangeTab(this.villager.getEntityId(), 3));
+		}
+		else if (button.displayString.equals("Inventory"))
+		{
+	    	Reference.PACKET_MODID.sendToServer(new MessageChangeTab(this.villager.getEntityId(), 4));
+		}
     }
 	
 	@Override
@@ -63,6 +90,11 @@ public class GuiIvVillagerInfo extends GuiContainer{
         String s = this.villager.getName();
         String health_amount = "";
         String g = "None";
+        String life_stage = this.villager.getAdultAge();
+        if (this.villager.isChild())
+        {
+        	life_stage = "Child";
+        }
         if (this.villager.getGender() == 1)
         {
         	g = "Male";
@@ -70,9 +102,9 @@ public class GuiIvVillagerInfo extends GuiContainer{
         else if (this.villager.getGender() == 2){
         	g = "Female";
         }
-        this.mc.fontRendererObj.drawString("Name: " + s, 12, 30, 4210752);
-        this.mc.fontRendererObj.drawString("Life Stage: " + this.villager.getAdultAge(), 12, 48, 4210752);
-        this.mc.fontRendererObj.drawString("Gender: " + g, 12, 66, 4210752);
+        this.mc.fontRenderer.drawString("Name: " + s, 12, 30, 4210752);
+        this.mc.fontRenderer.drawString("Life Stage: " + life_stage, 12, 48, 4210752);
+        this.mc.fontRenderer.drawString("Gender: " + g, 12, 66, 4210752);
         if (this.villager.getMaxHealth() * 0.75 <= this.villager.getHealth())
         {
         	health_amount = "Slightly Wounded";
@@ -101,16 +133,16 @@ public class GuiIvVillagerInfo extends GuiContainer{
         {
         	health_amount = "Perfectly Healthy";
         }
-        this.mc.fontRendererObj.drawString("Health: " + health_amount + "(" + String.valueOf(this.villager.getHealth()) + ")", 12, 84, 4210752);
+        this.mc.fontRenderer.drawString("Health: " + health_amount + "(" + String.valueOf(this.villager.getHealth()) + ")", 12, 84, 4210752);
         if (!(this.villager.getMotherId() == null))
         {
-            this.mc.fontRendererObj.drawString("Mother: " + this.villager.getMotherName(), 12, 102, 4210752);
+            this.mc.fontRenderer.drawString("Mother: " + this.villager.getMotherName(), 12, 102, 4210752);
         }
         if (!(this.villager.getFatherId() == null))
         {
-            this.mc.fontRendererObj.drawString("Father: " + this.villager.getFatherName(), 12, 120, 4210752);
+            this.mc.fontRenderer.drawString("Father: " + this.villager.getFatherName(), 12, 120, 4210752);
         }
-        this.mc.fontRendererObj.drawString(this.playerInv.getDisplayName().getFormattedText(), 8, 138, 4210752);
+        this.mc.fontRenderer.drawString(this.playerInv.getDisplayName().getFormattedText(), 8, 138, 4210752);
     }
 
 }

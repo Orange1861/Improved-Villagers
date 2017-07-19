@@ -21,24 +21,24 @@ public class ContainerIvVillagerHauler extends Container{
 		this.villager = villager;
 		this.handler = this.villager.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 		
-		this.addSlotToContainer(new SlotItemHandler(handler, 0, 25, 23));
-		this.addSlotToContainer(new SlotItemHandler(handler, 1, 43, 23));
-		this.addSlotToContainer(new SlotItemHandler(handler, 2, 61, 23));
-		this.addSlotToContainer(new SlotItemHandler(handler, 3, 79, 23));
-		this.addSlotToContainer(new SlotItemHandler(handler, 4, 97, 23));
-		this.addSlotToContainer(new SlotItemHandler(handler, 5, 25, 41));
-		this.addSlotToContainer(new SlotItemHandler(handler, 6, 43, 41));
-		this.addSlotToContainer(new SlotItemHandler(handler, 7, 61, 41));
-		this.addSlotToContainer(new SlotItemHandler(handler, 8, 79, 41));
-		this.addSlotToContainer(new SlotItemHandler(handler, 9, 97, 41));
-		this.addSlotToContainer(new SlotItemHandler(handler, 10, 25, 59));
-		this.addSlotToContainer(new SlotItemHandler(handler, 11, 43, 59));
-		this.addSlotToContainer(new SlotItemHandler(handler, 12, 61, 59));
-		this.addSlotToContainer(new SlotItemHandler(handler, 13, 79, 59));
-		this.addSlotToContainer(new SlotItemHandler(handler, 14, 97, 59));
+		this.addSlotToContainer(new SlotItemHandler(handler, 0, 40, 66));
+		this.addSlotToContainer(new SlotItemHandler(handler, 1, 58, 66));
+		this.addSlotToContainer(new SlotItemHandler(handler, 2, 76, 66));
+		this.addSlotToContainer(new SlotItemHandler(handler, 3, 94, 66));
+		this.addSlotToContainer(new SlotItemHandler(handler, 4, 112, 66));
+		this.addSlotToContainer(new SlotItemHandler(handler, 5, 40, 84));
+		this.addSlotToContainer(new SlotItemHandler(handler, 6, 58, 84));
+		this.addSlotToContainer(new SlotItemHandler(handler, 7, 76, 84));
+		this.addSlotToContainer(new SlotItemHandler(handler, 8, 94, 84));
+		this.addSlotToContainer(new SlotItemHandler(handler, 9, 112, 84));
+		this.addSlotToContainer(new SlotItemHandler(handler, 10, 40, 102));
+		this.addSlotToContainer(new SlotItemHandler(handler, 11, 58, 102));
+		this.addSlotToContainer(new SlotItemHandler(handler, 12, 76, 102));
+		this.addSlotToContainer(new SlotItemHandler(handler, 13, 94, 102));
+		this.addSlotToContainer(new SlotItemHandler(handler, 14, 112, 102));
 
 		int xPos = 8;
-		int yPos = 84;
+		int yPos = 153;
 				
 		for (int y = 0; y < 3; ++y) {
 			for (int x = 0; x < 9; ++x) {
@@ -56,7 +56,7 @@ public class ContainerIvVillagerHauler extends Container{
 	}
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
-        ItemStack previous = null;
+	    ItemStack previous = ItemStack.EMPTY;
 	    Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 
 	    if (slot != null && slot.getHasStack()) {
@@ -66,20 +66,20 @@ public class ContainerIvVillagerHauler extends Container{
 	        if (fromSlot < this.handler.getSlots()) {
 	            // From the block breaker inventory to player's inventory
 	            if (!this.mergeItemStack(current, handler.getSlots(), handler.getSlots() + 36, true))
-	                return (ItemStack) null;
+	                return ItemStack.EMPTY;
 	        } else {
 	            // From the player's inventory to block breaker's inventory
 	            if (!this.mergeItemStack(current, 0, handler.getSlots(), false))
-	                return (ItemStack) null;
+	                return ItemStack.EMPTY;
 	        }
 
-	        if (current.stackSize == 0) //Use func_190916_E() instead of stackSize 1.11 only 1.11.2 use getCount()
-	            slot.putStack((ItemStack) null); //Use ItemStack.field_190927_a instead of (ItemStack)null for a blank item stack. In 1.11.2 use ItemStack.EMPTY
+	        if (current.getCount() == 0) //Use func_190916_E() instead of stackSize 1.11 only 1.11.2 use getCount()
+	            slot.putStack(ItemStack.EMPTY); //Use ItemStack.field_190927_a instead of (ItemStack)null for a blank item stack. In 1.11.2 use ItemStack.EMPTY
 	        else
 	            slot.onSlotChanged();
 
-	        if (current.stackSize == previous.stackSize)
-	        slot.onPickupFromSlot(playerIn, current);
+	        if (current.getCount() == previous.getCount())
+	        slot.onTake(playerIn, current);
 	    }
 	    return previous;
 	}
