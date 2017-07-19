@@ -31,9 +31,9 @@ public class VillagerAIFollowParent extends EntityAIBase
     public boolean shouldExecute()
     {
         BlockPos blockpos = new BlockPos(this.entityObj);
-        if ((!this.entityObj.worldObj.isDaytime() || this.entityObj.worldObj.isRaining() && !this.entityObj.worldObj.getBiome(blockpos).canRain()) && !this.entityObj.worldObj.provider.getHasNoSky())
+        if ((!this.entityObj.world.isDaytime() || this.entityObj.world.isRaining() && !this.entityObj.world.getBiome(blockpos).canRain()) && this.entityObj.world.provider.hasSkyLight())
         {
-            	List<IvVillager> list = this.entityObj.worldObj.<IvVillager>getEntitiesWithinAABB(this.entityObj.getClass(), this.entityObj.getEntityBoundingBox().expand(128.0D, 6.0D, 128.0D));
+            	List<IvVillager> list = this.entityObj.world.<IvVillager>getEntitiesWithinAABB(this.entityObj.getClass(), this.entityObj.getEntityBoundingBox().expand(128.0D, 6.0D, 128.0D));
                 IvVillager entityanimal = null;
                 double d0 = Double.MAX_VALUE;
 

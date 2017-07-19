@@ -24,7 +24,7 @@ public class VilsPerDoor extends EntityAIBase
     public VilsPerDoor(EntityVillager villagerIn)
     {
         this.villagerObj = villagerIn;
-        this.world = villagerIn.worldObj;
+        this.world = villagerIn.world;
         this.setMutexBits(3);
     }
 
@@ -156,12 +156,12 @@ public class VilsPerDoor extends EntityAIBase
         if (rand.nextInt(100) + 1 <= Config.twins && Config.twins > 0){
         entityvillager2.setGrowingAge(-24000);
         entityvillager2.setLocationAndAngles(this.villagerObj.posX, this.villagerObj.posY, this.villagerObj.posZ, 0.0F, 0.0F);
-        this.world.spawnEntityInWorld(entityvillager2);
+        this.world.spawnEntity(entityvillager2);
         this.world.setEntityState(entityvillager2, (byte)12);
         }
         entityvillager.setGrowingAge(-24000);
         entityvillager.setLocationAndAngles(this.villagerObj.posX, this.villagerObj.posY, this.villagerObj.posZ, 0.0F, 0.0F);
-        this.world.spawnEntityInWorld(entityvillager);
+        this.world.spawnEntity(entityvillager);
         this.world.setEntityState(entityvillager, (byte)12);
     }
 

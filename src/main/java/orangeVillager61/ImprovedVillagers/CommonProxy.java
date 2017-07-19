@@ -23,8 +23,11 @@ public class CommonProxy {
 		ResourceLocation resourceLocation1 = new ResourceLocation("iv", "villager");
 		MinecraftForge.EVENT_BUS.register(new ChangeVilMateAI());
 		MinecraftForge.EVENT_BUS.register(new OverrideVillagers());
-		EntityRegistry.registerModEntity(IvVillager.class, "IvVillager", 0, Iv.instance, 32, 1, true);
-		//MinecraftForge.EVENT_BUS.register(new CapabilityHandler());
+		MinecraftForge.EVENT_BUS.register(new RevertVillagers());
+		EntityRegistry.registerModEntity(resourceLocation1, IvVillager.class, "IvVillager", 0, Iv.instance, 32, 1, true);
+		if (Config.enableVillages){
+			MinecraftForge.TERRAIN_GEN_BUS.register(new ChangeVillageGeneration());
+		}
 		IvItems.Init();
 		IvBlocks.Init();
 		IvItems.createItems();

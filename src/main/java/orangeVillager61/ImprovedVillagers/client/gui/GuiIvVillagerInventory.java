@@ -9,20 +9,19 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
 import orangeVillager61.ImprovedVillagers.Reference;
-import orangeVillager61.ImprovedVillagers.Container.ContainerIvVillagerHauler;
-import orangeVillager61.ImprovedVillagers.Container.ContainerIvVillagerHireNitwit;
+import orangeVillager61.ImprovedVillagers.Container.ContainerIvVillagerInventory;
 import orangeVillager61.ImprovedVillagers.Entities.IvVillager;
 import orangeVillager61.ImprovedVillagers.Packet.MessageChangeFollow;
 import orangeVillager61.ImprovedVillagers.Packet.MessageChangeTab;
 
-public class GuiIvVillagerHauler extends GuiContainer{
+public class GuiIvVillagerInventory extends GuiContainer{
 
 	private IvVillager villager;
 	private IInventory playerInv;
 	private String button_text;
 	
-	public GuiIvVillagerHauler(IvVillager villager, IInventory playerInv) {
-		super(new ContainerIvVillagerHauler(villager, playerInv));
+	public GuiIvVillagerInventory(IvVillager villager, IInventory playerInv) {
+		super(new ContainerIvVillagerInventory(villager, playerInv));
 		
 		this.xSize = 176;
 		this.ySize = 234;
@@ -34,17 +33,20 @@ public class GuiIvVillagerHauler extends GuiContainer{
 	public void initGui()
 	{
 		super.initGui();
-		if (this.villager.getFollowing()){
-			this.button_text = "Following";
-		}
-		else 
-		{
-			this.button_text = "Follow";
-		}
-        this.addButton(new ButtonFollow(0, this.getGuiLeft() + 75, this.getGuiTop() + 126, 60, 20, this.button_text, this.villager));
         this.addButton(new GuiButton(0, this.getGuiLeft(), this.getGuiTop(), 50, 20, "Info"));
-        this.addButton(new GuiButton(0, this.getGuiLeft() + 50, this.getGuiTop(), 50, 20, "Hauler"));
         this.addButton(new GuiButton(0, this.getGuiLeft() + 100, this.getGuiTop(), 50, 20, "Inventory"));
+        if (this.villager.getProfession() == 5 && this.villager.getHired())
+        {
+            this.addButton(new GuiButton(0, this.getGuiLeft() + 50, this.getGuiTop(), 50, 20, "Hauler"));
+        }
+        else if (this.villager.getProfession() == 5 && !this.villager.getHired())
+        {
+            this.addButton(new GuiButton(0, this.getGuiLeft() + 50, this.getGuiTop(), 50, 20, "Hire"));
+        }
+        else if (!(this.villager.getProfession() == 5) && !this.villager.isChild())
+        {
+            this.addButton(new GuiButton(0, this.getGuiLeft() + 50, this.getGuiTop(), 50, 20, "Trade"));
+        }
 	}
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
@@ -59,27 +61,18 @@ public class GuiIvVillagerHauler extends GuiContainer{
 		{
 	    	Reference.PACKET_MODID.sendToServer(new MessageChangeTab(this.villager.getEntityId(), 0));
 		}
+		else if (button.displayString.equals("Hire"))
+		{
+	    	Reference.PACKET_MODID.sendToServer(new MessageChangeTab(this.villager.getEntityId(), 1));
+		}
 		else if (button.displayString.equals("Hauler"))
 		{
-			
+	    	Reference.PACKET_MODID.sendToServer(new MessageChangeTab(this.villager.getEntityId(), 2));
 		}
-		else if (button.displayString.equals("Inventory"))
+		else if (button.displayString.equals("Trade"))
 		{
-	    	Reference.PACKET_MODID.sendToServer(new MessageChangeTab(this.villager.getEntityId(), 4));
-		}
-		else
-		{
-			if (this.villager.getHired())
-			{ 
-		    	Reference.PACKET_MODID.sendToServer(new MessageChangeFollow(this.villager.getEntityId()));
-			}
-			if (this.villager.getFollowing()){
-				this.button_text = "Following";
-			}
-			else 
-			{
-				this.button_text = "Follow";
-			}
+	    	Reference.PACKET_MODID.sendToServer(new MessageChangeTab(this.villager.getEntityId(), 3));
+		
 		}
     }
 	@Override

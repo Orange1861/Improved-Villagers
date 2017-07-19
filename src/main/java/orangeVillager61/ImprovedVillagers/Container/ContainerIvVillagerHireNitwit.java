@@ -19,10 +19,11 @@ public class ContainerIvVillagerHireNitwit extends Container{
 		this.villager = villager;
 		this.handler = this.villager.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 
-		this.addSlotToContainer(new SlotItemHandler(handler, 0, 76, 47));
-		int xPos = 8;
-		int yPos = 84;
+		this.addSlotToContainer(new SlotItemHandler(handler, 0, 83, 83));
 		
+		int xPos = 8;
+		int yPos = 153;
+				
 		for (int y = 0; y < 3; ++y) {
 			for (int x = 0; x < 9; ++x) {
 				this.addSlotToContainer(new Slot(playerInv, x + y * 9 + 9, xPos + x * 18, yPos + y * 18));
@@ -39,7 +40,7 @@ public class ContainerIvVillagerHireNitwit extends Container{
 	}
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer playerIn, int fromSlot) {
-        ItemStack previous = null;
+	    ItemStack previous = ItemStack.EMPTY;
 	    Slot slot = (Slot) this.inventorySlots.get(fromSlot);
 
 	    if (slot != null && slot.getHasStack()) {
@@ -49,20 +50,20 @@ public class ContainerIvVillagerHireNitwit extends Container{
 	        if (fromSlot < this.handler.getSlots()) {
 	            // From the block breaker inventory to player's inventory
 	            if (!this.mergeItemStack(current, handler.getSlots(), handler.getSlots() + 36, true))
-	                return (ItemStack) null;
+	                return ItemStack.EMPTY;
 	        } else {
 	            // From the player's inventory to block breaker's inventory
 	            if (!this.mergeItemStack(current, 0, handler.getSlots(), false))
-	                return (ItemStack) null;
+	                return ItemStack.EMPTY;
 	        }
 
-	        if (current.stackSize == 0) //Use func_190916_E() instead of stackSize 1.11 only 1.11.2 use getCount()
-	            slot.putStack((ItemStack) null); //Use ItemStack.field_190927_a instead of (ItemStack)null for a blank item stack. In 1.11.2 use ItemStack.EMPTY
+	        if (current.getCount() == 0) //Use func_190916_E() instead of stackSize 1.11 only 1.11.2 use getCount()
+	            slot.putStack(ItemStack.EMPTY); //Use ItemStack.field_190927_a instead of (ItemStack)null for a blank item stack. In 1.11.2 use ItemStack.EMPTY
 	        else
 	            slot.onSlotChanged();
 
-	        if (current.stackSize == previous.stackSize)
-	        slot.onPickupFromSlot(playerIn, current);
+	        if (current.getCount() == previous.getCount())
+	        slot.onTake(playerIn, current);
 	    }
 	    return previous;
 	}
