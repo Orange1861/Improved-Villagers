@@ -58,13 +58,14 @@ public class ContainerIvVillagerInventory extends Container{
 	@Override
 	public boolean canInteractWith(EntityPlayer player) {
 		return true;
+
 	}
 	
     protected ViewSlot addSlotToContainer(ViewSlot slotIn)
     {
-        slotIn.slotNumber = this.inventorySlots.size();
+        slotIn.slotNumber = this.inventorySlots.size() + 1;
         this.inventorySlots.add(slotIn);
-        this.inventoryItemStacks.add(ItemStack.EMPTY);
+        //this.inventoryItemStacks.add(ItemStack.EMPTY);
         return slotIn;
     }
 }
