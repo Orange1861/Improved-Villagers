@@ -63,7 +63,7 @@ public class ContainerIvVillagerInventory extends Container{
 	
     protected ViewSlot addSlotToContainer(ViewSlot slotIn)
     {
-        slotIn.slotNumber = this.inventorySlots.size() + 1;
+        slotIn.slotNumber = this.inventorySlots.size();
         this.inventorySlots.add(slotIn);
         //this.inventoryItemStacks.add(ItemStack.EMPTY);
         return slotIn;
