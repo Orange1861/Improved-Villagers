@@ -17,7 +17,7 @@ import orangeVillager61.ImprovedVillagers.Packet.MessageChangeTabHandler;
 import orangeVillager61.ImprovedVillagers.Packet.MessageHireVillager;
 import orangeVillager61.ImprovedVillagers.Packet.MessageHireVillagerHandler;
 
-@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, updateJSON = "https://raw.githubusercontent.com/Orange1861/update.json/master/update3.json", acceptedMinecraftVersions = "1.10.2-1.11.2")
+@Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, updateJSON = "https://raw.githubusercontent.com/Orange1861/update.json/master/update3.json", acceptedMinecraftVersions = "1.12-1.12.1")
 public class Iv {
 	
 	@Instance

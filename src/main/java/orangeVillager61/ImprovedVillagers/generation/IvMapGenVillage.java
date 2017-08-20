@@ -36,8 +36,8 @@ public class IvMapGenVillage extends MapGenVillage
     {
         this.distance = Config.VillageDistance;
         this.minTownSeparation = 4;
-        this.isMetropolis = true;
-        if (r.nextInt(20) + 1 == 2 && Config.enable_Metro){
+        this.isMetropolis = false;
+        if (r.nextInt(12) + 1 == 2 && Config.enable_Metro){
         	this.isMetropolis = true;
         }
     }
@@ -111,7 +111,7 @@ public class IvMapGenVillage extends MapGenVillage
     {
     	if (this.isMetropolis)
     	{
-    		this.size = r.nextInt(1) + 4;
+    		this.size = r.nextInt(3) + 4;
     	}
         return new IvMapGenVillage.Start(this.world, this.rand, chunkX, chunkZ, this.size, this.isMetropolis);
     }

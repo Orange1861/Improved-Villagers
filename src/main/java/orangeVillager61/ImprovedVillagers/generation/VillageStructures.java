@@ -75,15 +75,15 @@ public class VillageStructures
     public static List<VillageStructures.PieceWeight> getStructureVillageWeightedPieceList(Random random, int size)
     {
         List<VillageStructures.PieceWeight> list = Lists.<VillageStructures.PieceWeight>newArrayList();
-        list.add(new VillageStructures.PieceWeight(VillageStructures.House4Garden.class, 4, MathHelper.getInt(random, 4 + size, 11 + size * 2)));
+        list.add(new VillageStructures.PieceWeight(VillageStructures.House4Garden.class, 4, MathHelper.getInt(random, 2 + size, 11 + size * 2)));
         list.add(new VillageStructures.PieceWeight(VillageStructures.Church.class, 20, MathHelper.getInt(random, 0 + size, 2 + size/2)));
         list.add(new VillageStructures.PieceWeight(VillageStructures.House1.class, 20, MathHelper.getInt(random, 0 + size, 2 + size/2)));
         list.add(new VillageStructures.PieceWeight(VillageStructures.WoodHut.class, 3, MathHelper.getInt(random, 4 + size, 11 + size * 3)));
         list.add(new VillageStructures.PieceWeight(VillageStructures.Hall.class, 15, MathHelper.getInt(random, 1 + size, 4 + size)));
-        list.add(new VillageStructures.PieceWeight(VillageStructures.Field1.class, 3, MathHelper.getInt(random, 4 + size, 10 + size)));
-        list.add(new VillageStructures.PieceWeight(VillageStructures.Field2.class, 3, MathHelper.getInt(random, 5 + size, 10 + size * 2)));
+        list.add(new VillageStructures.PieceWeight(VillageStructures.Field1.class, 3, MathHelper.getInt(random, 3 + size, 10 + size)));
+        list.add(new VillageStructures.PieceWeight(VillageStructures.Field2.class, 3, MathHelper.getInt(random, 3 + size, 10 + size * 2)));
         list.add(new VillageStructures.PieceWeight(VillageStructures.House2.class, 15, MathHelper.getInt(random, 0, 2 + size/2)));
-        list.add(new VillageStructures.PieceWeight(VillageStructures.House3.class, 8, MathHelper.getInt(random, 0 + size, 3 + size * 2)));
+        list.add(new VillageStructures.PieceWeight(VillageStructures.House3.class, 8, MathHelper.getInt(random, 1 + size, 4 + size * 2)));
         Reflector.reflectMethod1(list, random, size);
         Iterator<VillageStructures.PieceWeight> iterator = list.iterator();
 
@@ -1297,7 +1297,7 @@ public class VillageStructures
 	        }
 	        if (Config.overwriteOriginalVillagers)
 	        {
-		        this.spawnIvVillagers(worldIn, structureBoundingBoxIn, 4, 1, 2, 2, true, r.nextInt(6));
+		        this.spawnIvVillagers(worldIn, structureBoundingBoxIn, 4, 1, 2, 2, true, 0);
 	        }
 	        else
 	        {
@@ -2551,7 +2551,7 @@ public class VillageStructures
             }
             protected int chooseProfession(int villagersSpawnedIn, int currentVillagerProfession)
             {
-                return 0;
+                return 5;
             }
         }
 }

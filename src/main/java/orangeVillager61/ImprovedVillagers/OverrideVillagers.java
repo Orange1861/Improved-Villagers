@@ -20,25 +20,24 @@ public class OverrideVillagers {
 	{
 		if (event.getEntity().getClass() == EntityVillager.class && Config.overwriteOriginalVillagers && event.getWorld().isRemote == false && !Config.revertVillagers)
 		{
-			event.getEntity().setDead();
-			doOverwriteVillager(event, (EntityVillager) event.getEntity());
+			if (((EntityVillager) event.getEntity()).getProfession() >= 0 && ((EntityVillager) event.getEntity()).getProfession() <= 5)
+			{
+				event.getEntity().setDead();
+				doOverwriteVillager(event, (EntityVillager) event.getEntity());
+			}
 		}
 	}
 
 	private void doOverwriteVillager(EntityJoinWorldEvent event, EntityVillager entity) 
 	{
-		if (entity.getProfession() >= 0 && entity.getProfession() <= 5)
-		{
-			int Gender;
-		    Gender = r.nextInt(2) + 1;
-	        String Name = IvVillager.random_name(Gender);
-			IvVillager entityVillager = new IvVillager(entity.getWorld(), entity.getProfession(), Gender, Name);
-			entityVillager.setGrowingAge(entity.getGrowingAge());
-			entityVillager.onInitialSpawn(event.getWorld().getDifficultyForLocation(new BlockPos(entity)), (IEntityLivingData)null);
-			entityVillager.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, 0.0F, 0.0F);
-			event.getWorld().setEntityState(entityVillager, (byte)12); 
-			event.getWorld().spawnEntity(entityVillager); 
-			
-		}
+		int Gender;
+		Gender = r.nextInt(2) + 1;
+	    String Name = IvVillager.random_name(Gender);
+		IvVillager entityVillager = new IvVillager(entity.getWorld(), entity.getProfession(), Gender, Name);
+		entityVillager.setGrowingAge(entity.getGrowingAge());
+		entityVillager.onInitialSpawn(event.getWorld().getDifficultyForLocation(new BlockPos(entity)), (IEntityLivingData)null);
+		entityVillager.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, 0.0F, 0.0F);
+		event.getWorld().setEntityState(entityVillager, (byte)12); 
+		event.getWorld().spawnEntity(entityVillager); 
 	}
 }

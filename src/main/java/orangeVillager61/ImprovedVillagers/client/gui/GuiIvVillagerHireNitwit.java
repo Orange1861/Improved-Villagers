@@ -47,7 +47,7 @@ public class GuiIvVillagerHireNitwit extends GuiContainer{
         this.addButton(new GuiButton(0, this.getGuiLeft() + 75, this.getGuiTop() + 120, 60, 20, "Hire!"));
         this.addButton(new GuiButton(0, this.getGuiLeft(), this.getGuiTop(), 50, 20, "Info"));
         this.addButton(new GuiButton(0, this.getGuiLeft() + 50, this.getGuiTop(), 50, 20, "Hire"));
-        this.addButton(new GuiButton(0, this.getGuiLeft() + 100, this.getGuiTop(), 50, 20, "Inventory"));
+        //this.addButton(new GuiButton(0, this.getGuiLeft() + 100, this.getGuiTop(), 50, 20, "Inventory"));
 	}
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {

@@ -24,14 +24,12 @@ public class CommonProxy {
 		MinecraftForge.EVENT_BUS.register(new ChangeVilMateAI());
 		MinecraftForge.EVENT_BUS.register(new OverrideVillagers());
 		MinecraftForge.EVENT_BUS.register(new RevertVillagers());
+		MinecraftForge.EVENT_BUS.register(new AttachCapabilties());
 		EntityRegistry.registerModEntity(resourceLocation1, IvVillager.class, "IvVillager", 0, Iv.instance, 32, 1, true);
 		if (Config.enableVillages){
 			MinecraftForge.TERRAIN_GEN_BUS.register(new ChangeVillageGeneration());
 		}
-		IvItems.Init();
-		IvBlocks.Init();
-		IvItems.createItems();
-		IvBlocks.createBlocks();
+		IvCapabilities.regsiterCapabilties();
 		
 	}
 	@EventHandler
