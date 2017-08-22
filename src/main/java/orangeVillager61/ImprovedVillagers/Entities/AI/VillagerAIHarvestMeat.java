@@ -35,7 +35,7 @@ public class VillagerAIHarvestMeat extends EntityAIBase
     {
         this.villagerObj = villagerIn;
         this.world = villagerIn.world;
-        this.setMutexBits(3);
+        this.setMutexBits(1);
     }
 
     /**
@@ -122,6 +122,10 @@ public class VillagerAIHarvestMeat extends EntityAIBase
         {
             return false;
         }
+    	else if (this.villagerObj.getNavigator().noPath())
+    	{
+    		return false;
+    	}
         else
         {
             System.out.println("Butcher task allowed to continue.");

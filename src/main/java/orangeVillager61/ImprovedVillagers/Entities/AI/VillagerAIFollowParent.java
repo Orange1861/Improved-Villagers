@@ -23,6 +23,7 @@ public class VillagerAIFollowParent extends EntityAIBase
     {
         this.entityObj = entityObjIn;
         this.moveSpeed = speed;
+        this.setMutexBits(8);
     }
 
     /**

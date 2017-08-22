@@ -83,6 +83,8 @@ import orangeVillager61.ImprovedVillagers.Entities.AI.VillagerAIInteract;
 import orangeVillager61.ImprovedVillagers.Entities.AI.VillagerAvoidEvilPlayer;
 import orangeVillager61.ImprovedVillagers.Entities.AI.VillagerFollowEmerald;
 import orangeVillager61.ImprovedVillagers.Entities.AI.VillagerFollowOwner;
+import orangeVillager61.ImprovedVillagers.Entities.AI.VillagerMoveIndoors;
+import orangeVillager61.ImprovedVillagers.Entities.AI.VillagerOpenDoor;
 import orangeVillager61.ImprovedVillagers.Entities.AI.VilsPerDoor;
 import orangeVillager61.ImprovedVillagers.Items.IvItems;
 import orangeVillager61.ImprovedVillagers.client.gui.GuiHandler;
@@ -762,6 +764,7 @@ public class IvVillager extends EntityVillager{
 			BlockPos blockpos = new BlockPos(this);
 			this.villageObj = this.world.getVillageCollection().getNearestVillage(blockpos, 32);
 	        this.tasks.addTask(0, new EntityAISwimming(this));
+	        this.tasks.addTask(1, new VillagerMoveIndoors(this));
 	        this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityZombie.class, 8.0F, 0.6D, 0.6D));
 	        //this.tasks.addTask(1, new VillagerAvoidEvilPlayer(this, 8.0F, 0.6D, 0.6D, this.villageObj));
 	        this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityEvoker.class, 12.0F, 0.8D, 0.8D));
@@ -769,11 +772,10 @@ public class IvVillager extends EntityVillager{
 	        this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityVex.class, 8.0F, 0.6D, 0.6D));
 	        this.tasks.addTask(1, new EntityAIPanic(this, 0.8D));
 	        this.tasks.addTask(2, new VillagerAIFollowParent(this, 0.8D));
-	        this.tasks.addTask(1, new EntityAITradePlayer(this));
+	        this.tasks.addTask(2, new EntityAITradePlayer(this));
 	        this.tasks.addTask(2, new EntityAILookAtTradePlayer(this));
-	        this.tasks.addTask(2, new EntityAIMoveIndoors(this));
 	        this.tasks.addTask(3, new EntityAIRestrictOpenDoor(this));
-	        this.tasks.addTask(3, new EntityAITempt(this, 0.85D, Items.EMERALD, false));
+	        this.tasks.addTask(4, new EntityAITempt(this, 0.85D, Items.EMERALD, false));
 	        //this.tasks.addTask(3, new VillagerFollowEmerald(this, 0.9D, Items.EMERALD, false, this.villageObj));
 	        this.tasks.addTask(4, new EntityAIOpenDoor(this, true));
 	        this.tasks.addTask(5, new EntityAIMoveTowardsRestriction(this, 0.6D));
@@ -790,22 +792,22 @@ public class IvVillager extends EntityVillager{
         if (!this.areAdditionalTasksSet)
         {
             this.areAdditionalTasksSet = true;
-
             if (this.isChild())
             {
                 this.tasks.addTask(8, new EntityAIPlay(this, 0.32D));
             }
             else if (this.getProfessionForge() == PROFESSION_FARMER || this.getProfession() == 0)
             {
-                this.tasks.addTask(6, new EntityAIHarvestFarmland(this, 0.6D));
+                this.tasks.addTask(5, new EntityAIHarvestFarmland(this, 0.6D));
             }
             else if (this.getProfession() == 4 || this.getProfessionForge() == PROFESSION_BUTCHER)
             {
-                this.tasks.addTask(6, new VillagerAIHarvestMeat(this));
+                this.tasks.addTask(5, new VillagerAIHarvestMeat(this));
+                System.out.println("Villager will now harvest meat.");
             }
             if (this.getHired())
             {
-                this.tasks.addTask(6, new VillagerFollowOwner(this, 0.9D, 6.0F, 1.5F));
+                this.tasks.addTask(5, new VillagerFollowOwner(this, 0.9D, 6.0F, 1.5F));
             }
         }
     }

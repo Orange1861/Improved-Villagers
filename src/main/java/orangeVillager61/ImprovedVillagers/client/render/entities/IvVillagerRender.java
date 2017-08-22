@@ -33,6 +33,8 @@ public class IvVillagerRender extends RenderLiving<IvVillager>
     private static final ResourceLocation PRIEST_VILLAGER_OLD_TEXTURES = new ResourceLocation("iv:textures/entity/villager/priest_old.png");
     private static final ResourceLocation SMITH_VILLAGER_OLD_TEXTURES = new ResourceLocation("iv:textures/entity/villager/smith_old.png");
     private static final ResourceLocation BUTCHER_VILLAGER_OLD_TEXTURES = new ResourceLocation("iv:textures/entity/villager/butcher_old.png");
+    private static final ResourceLocation DEFAULT = new ResourceLocation("textures/entity/villager/villager.png");
+
 
     public IvVillagerRender(RenderManager renderManager)
     {
@@ -77,7 +79,7 @@ public class IvVillagerRender extends RenderLiving<IvVillager>
 			}
 		    else
 		    {
-		    	return VILLAGER_YOUNG_TEXTURES;
+		    	return DEFAULT;
 		    }
     	}
     	else if (entity.getAdultAge().equals("Middle Aged")){
@@ -107,7 +109,7 @@ public class IvVillagerRender extends RenderLiving<IvVillager>
 	    	}
 	        else
 	        {
-	        	return VILLAGER_TEXTURES;
+	        	return DEFAULT;
 	        }
     	}
     	else if (entity.getAdultAge().equals("Elder")){
@@ -137,7 +139,7 @@ public class IvVillagerRender extends RenderLiving<IvVillager>
         	}
             else
             {
-            	return VILLAGER_OLD_TEXTURES;
+            	return DEFAULT;
             }
         	}
     	else{

@@ -2120,7 +2120,7 @@ public class VillageStructures
 				    	        String Name = IvVillager.random_name(Gender);
 				                IvVillager entityvillager = new IvVillager(worldIn, prof, Gender, Name);
 				                entityvillager.setLocationAndAngles((double)j + 0.5D, (double)k, (double)l + 0.5D, 0.0F, 0.0F);
-				                entityvillager.setProfession(this.chooseForgeProfession(i, entityvillager.getProfessionForge()));
+				                //entityvillager.setProfession(this.chooseForgeProfession(i, entityvillager.getProfessionForge()));
 				                entityvillager.finalizeMobSpawn(worldIn.getDifficultyForLocation(new BlockPos(entityvillager)), (IEntityLivingData)null, false);
 				                worldIn.spawnEntity(entityvillager);
 			            	}
