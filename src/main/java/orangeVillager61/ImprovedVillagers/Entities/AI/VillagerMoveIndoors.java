@@ -1,6 +1,5 @@
 package orangeVillager61.ImprovedVillagers.Entities.AI;
 
-import net.minecraft.entity.EntityCreature;
 import net.minecraft.entity.ai.EntityAIBase;
 import net.minecraft.entity.ai.RandomPositionGenerator;
 import net.minecraft.entity.monster.EntityZombie;
@@ -9,15 +8,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.village.Village;
 import net.minecraft.village.VillageDoorInfo;
+import orangeVillager61.ImprovedVillagers.Entities.IvVillager;
 
 public class VillagerMoveIndoors extends EntityAIBase
 {
-    private final EntityCreature entity;
+    private final IvVillager entity;
     private VillageDoorInfo doorInfo;
     private int insidePosX = -1;
     private int insidePosZ = -1;
 
-    public VillagerMoveIndoors(EntityCreature entityIn)
+    public VillagerMoveIndoors(IvVillager entityIn)
     {
         this.entity = entityIn;
         this.setMutexBits(1);
@@ -113,12 +113,12 @@ public class VillagerMoveIndoors extends EntityAIBase
 
             if (vec3d != null)
             {
-                this.entity.getNavigator().tryMoveToXYZ(vec3d.x, vec3d.y, vec3d.z, 1.0D);
+                this.entity.getNavigator().tryMoveToXYZ(vec3d.x, vec3d.y, vec3d.z, 0.7D);
             }
         }
         else
         {
-            this.entity.getNavigator().tryMoveToXYZ((double)i + 0.5D, (double)j, (double)k + 0.5D, 1.0D);
+            this.entity.getNavigator().tryMoveToXYZ((double)i + 0.5D, (double)j, (double)k + 0.5D, 0.7D);
         }
     }
 

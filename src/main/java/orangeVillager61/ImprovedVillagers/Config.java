@@ -35,7 +35,7 @@ public class Config {
 	VillageDistance = config.getInt("Village Distance", Configuration.CATEGORY_GENERAL, 24, 2, 1024, "For each of this number of blocks, a village will try to spawn, Unmodded:32. This is will not do anything if Enable Villages is set to false");
 	enable_Metro = config.getBoolean("Enable Cities", Configuration.CATEGORY_GENERAL, true, "If this is set to true, then there will be a 1/20 chance of cities (massive villages) will spawn. May be buggy");
 	use_spanish = config.getBoolean("Use_Spanish", Configuration.CATEGORY_GENERAL, false, "If this is set to true, then villagers will be named with Hispanic names.");
-	adult_days = config.getInt("Number of Minecraft Days as Adult", Configuration.CATEGORY_GENERAL, 45, 2, 1024, "This is the number of mc days that a villager will live, each life stage will take up 1/3 of the number of mc days set.");
+	adult_days = config.getInt("Number of Minecraft Days as Adult", Configuration.CATEGORY_GENERAL, 54, 2, 1000000, "This is the number of mc days that a villager will live, each life stage will take up 1/3 of the number of mc days set.");
 	straight_to_trade = config.getBoolean("Straight to Trade", Configuration.CATEGORY_GENERAL, false, "If this is set to true, then the tabs will be bypassed to just trade with the villagers. Useful for those that don't want the tabs or the tabs aren't popping up.");
 	if (config.hasChanged())
 	{

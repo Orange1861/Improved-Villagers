@@ -43,66 +43,73 @@ public class VillagerAIHarvestMeat extends EntityAIBase
      */
     public boolean shouldExecute()
     {
-    	System.out.println("Should Execute started.");
-        if (this.villagerObj.getGrowingAge() != 0)
+    	if (this.villagerObj.getGrowingAge() < 0)
         {
-    		System.out.println("Isn't adult");
             return false;
         }
+    	else if (this.villagerObj.getWorkTicks() > 0)
+    	{
+            return false;
+    	}
         else if (this.villagerObj.wantsMoreFood() == false)
         {
-    		System.out.println("Doesn't want food");
         	return false;
         }
         else if (this.villagerObj.getProfession() != 4)
         {
-    		System.out.println("Is not a butcher");
         	return false;
         }
         else
         {
-            EntityAnimal entity = (EntityAnimal) this.world.findNearestEntityWithinAABB(EntityAnimal.class, this.villagerObj.getEntityBoundingBox().expand(100.0D, 7.0D, 100.0D), this.villagerObj);
-
-            if (entity == null)
+        	List<EntityAnimal> list = this.villagerObj.world.<EntityAnimal>getEntitiesWithinAABB(EntityAnimal.class, this.villagerObj.getEntityBoundingBox().expand(98.0D, 3.0D, 98.0D));
+            if (list.isEmpty())
             {
-        		System.out.println("Entity is null");
                 return false;
             }
-            if (this.villagerObj.world.getWorldTime() - entity.getCapability(HarvestTimeProvider.CAPABILITY_HARVEST_ANIMAL_TIME, null).get_time() < 24000 && entity.getCapability(HarvestTimeProvider.CAPABILITY_HARVEST_ANIMAL_TIME, null).get_time() != 0)
-			{
-        		System.out.println("Entity has been harvested");
-				return false;
-			}
-            if (entity.getGrowingAge() < 0)
+            for (EntityAnimal entity : list)
             {
-        		System.out.println("Entity is not adult");
-            	return false;
+	            if (entity == null)
+	            {
+	            	continue;
+	            }
+	            if (this.villagerObj.world.getWorldTime() - entity.getCapability(HarvestTimeProvider.CAPABILITY_HARVEST_ANIMAL_TIME, null).get_time() < 24000 && entity.getCapability(HarvestTimeProvider.CAPABILITY_HARVEST_ANIMAL_TIME, null).get_time() != 0)
+				{
+	            	continue;
+				}
+	            if (entity.getGrowingAge() < 0)
+	            {
+	            	continue;
+	            }
+	            if (entity instanceof EntityCow)
+	            {
+	            	this.animal_type = "Cow";
+	                this.animal = entity;
+	                continue;
+	            }
+	            else if (entity instanceof EntityPig)
+	            {
+	            	this.animal_type = "Pig";
+	                this.animal = entity;
+	            	return true;
+	            }
+	            else if (entity instanceof EntitySheep)
+	            {
+	            	this.animal_type = "Sheep";
+	                this.animal = entity;
+	            	return true;
+	            }
+	            else if (entity instanceof EntityChicken)
+	            {
+	            	this.animal_type = "Chicken";            	
+	                this.animal = entity;
+	            	return true;
+	            }
+	            else
+	            {
+	            	continue;
+	            }
             }
-            if (entity instanceof EntityCow)
-            {
-            	this.animal_type = "Cow";
-            	return true;
-            }
-            else if (entity instanceof EntityPig)
-            {
-            	this.animal_type = "Pig";
-            	return true;
-            }
-            else if (entity instanceof EntitySheep)
-            {
-            	this.animal_type = "Sheep";
-            	return true;
-            }
-            else if (entity instanceof EntityChicken)
-            {
-            	this.animal_type = "Chicken";
-            	return true;
-            }
-            else
-            {
-        		System.out.println("Entity is not harvestable");
-            	return false;
-            }            
+            return false;
         }
     }
     /**
@@ -110,7 +117,6 @@ public class VillagerAIHarvestMeat extends EntityAIBase
      */
     public void startExecuting()
     {
-        System.out.println("Butcher task approved.");
         this.delayCounter = 0;
     }
     /**
@@ -137,7 +143,6 @@ public class VillagerAIHarvestMeat extends EntityAIBase
      */
     public void resetTask()
     {
-        this.animal = null;
         this.villagerObj.getNavigator().clearPathEntity();
         this.delayCounter = 5;
     }
@@ -146,13 +151,16 @@ public class VillagerAIHarvestMeat extends EntityAIBase
      */
     public void updateTask()
     {
-        System.out.println("Butcher to animal.");
-        if (this.villagerObj.getDistanceSqToEntity(this.animal) > 2.25D)
+        if (this.villagerObj.getDistanceSqToEntity(this.animal) > 1.5D)
         {
-            if (--this.delayCounter <= 0)
+            if (this.delayCounter <= 0)
             {
                 this.delayCounter = 10;
-                this.villagerObj.getNavigator().tryMoveToEntityLiving(this.animal, 0.53D);
+                this.villagerObj.getNavigator().tryMoveToEntityLiving(this.animal, 0.55D);
+            }
+            else
+            {
+            	this.delayCounter -= 1;
             }
         }
         else
@@ -179,7 +187,6 @@ public class VillagerAIHarvestMeat extends EntityAIBase
     	{
     		this.animal.dropItem(Items.COOKED_CHICKEN, 1);
     	}
-        System.out.println("Butcher got the meat.");
     	this.villagerObj.setWorkTicks(200);
     	this.animal.getCapability(HarvestTimeProvider.CAPABILITY_HARVEST_ANIMAL_TIME, null).setTime(this.animal.world.getWorldTime());
     }
