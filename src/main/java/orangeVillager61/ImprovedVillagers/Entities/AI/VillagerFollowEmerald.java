@@ -154,7 +154,7 @@ public class VillagerFollowEmerald extends EntityAIBase
     {
         this.temptedEntity.getLookHelper().setLookPositionWithEntity(this.temptingPlayer, (float)(this.temptedEntity.getHorizontalFaceSpeed() + 20), (float)this.temptedEntity.getVerticalFaceSpeed());
 
-        if (this.temptedEntity.getDistanceSqToEntity(this.temptingPlayer) < 6.25D)
+        if (this.temptedEntity.getDistanceSqToEntity(this.temptingPlayer) < 8.25D)
         {
             this.temptedEntity.getNavigator().clearPathEntity();
         }

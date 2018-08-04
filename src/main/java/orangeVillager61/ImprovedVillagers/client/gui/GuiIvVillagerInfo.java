@@ -42,7 +42,7 @@ public class GuiIvVillagerInfo extends GuiContainer{
 	{
 		super.initGui();
         this.addButton(new GuiButton(0, this.getGuiLeft(), this.getGuiTop(), 50, 20, "Info"));
-        this.addButton(new GuiButton(0, this.getGuiLeft() + 100, this.getGuiTop(), 50, 20, "Inventory"));
+        //this.addButton(new GuiButton(0, this.getGuiLeft() + 100, this.getGuiTop(), 50, 20, "Inventory"));
         if (this.villager.getProfession() == 5 && this.villager.getHired())
         {
             this.addButton(new GuiButton(0, this.getGuiLeft() + 50, this.getGuiTop(), 50, 20, "Hauler"));

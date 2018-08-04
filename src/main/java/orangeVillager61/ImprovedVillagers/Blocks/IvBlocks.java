@@ -2,28 +2,36 @@ package orangeVillager61.ImprovedVillagers.Blocks;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
+@Mod.EventBusSubscriber
 public final class IvBlocks {
 
-	public static Block villager_nose;
-	public static Block light_blue_stairs;
+	@GameRegistry.ObjectHolder("iv:light_blue_stairs")
+	public static final LightBlueStairs light_blue_stairs = null;
 	
-	public static void Init(){
-		villager_nose = new Villager_Nose("villager_nose", Material.CLAY, 1.0F, 0.25F);
-		light_blue_stairs = new LightBlueStairs("light_blue_stairs");
-	}
-	public static void createBlocks()
-	{
-		registerBlock(villager_nose);
-		registerBlock(light_blue_stairs);
-	}
+	@GameRegistry.ObjectHolder("iv:villager_nose")
+	public static final Villager_Nose villager_nose = null;
 	
-	protected static void registerBlock(Block block){
-		GameRegistry.register(block);
-		ItemBlock item = new ItemBlock(block);
-		item.setRegistryName(block.getRegistryName());
-		GameRegistry.register(item);
-	}
+	@SubscribeEvent
+    public static void registerBlocks(RegistryEvent.Register<Block> event) {
+        event.getRegistry().register(new LightBlueStairs());
+        event.getRegistry().register(new Villager_Nose());
+    }
+	
+    @SubscribeEvent
+    public static void registerItems(RegistryEvent.Register<Item> event) {
+        event.getRegistry().register(new ItemBlock(light_blue_stairs).setRegistryName(light_blue_stairs.getRegistryName()));
+        event.getRegistry().register(new ItemBlock(villager_nose).setRegistryName(villager_nose.getRegistryName()));
+    }
+    
+    public static void initModels() {
+    	light_blue_stairs.initModel();
+    	villager_nose.initModel();
+    }
 }

@@ -53,7 +53,7 @@ public abstract class VillagerAIDoorInteract extends EntityAIBase
                 for (int i = 0; i < Math.min(path.getCurrentPathIndex() + 2, path.getCurrentPathLength()); ++i)
                 {
                     PathPoint pathpoint = path.getPathPointFromIndex(i);
-                    this.doorPosition = new BlockPos(pathpoint.xCoord, pathpoint.yCoord, pathpoint.zCoord);
+                    this.doorPosition = new BlockPos(pathpoint.x, pathpoint.y, pathpoint.z);
 
                     if (this.theEntity.getDistanceSq((double)this.doorPosition.getX(), this.theEntity.posY, (double)this.doorPosition.getZ()) <= 2.25D)
                     {

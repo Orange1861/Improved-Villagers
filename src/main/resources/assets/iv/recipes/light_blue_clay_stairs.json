@@ -1,0 +1,18 @@
+{
+  "result": {
+    "item": "iv:light_blue_stairs",
+    "count": 4
+  },
+  "pattern": [
+    "b  ",
+    "bb ",
+    "bbb"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "b": {
+      "item": "minecraft:stained_hardened_clay",
+      "data": 3
+    }
+  }
+}

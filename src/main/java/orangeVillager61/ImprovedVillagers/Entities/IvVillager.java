@@ -36,6 +36,7 @@ import net.minecraft.entity.ai.EntityAIVillagerMate;
 import net.minecraft.entity.ai.EntityAIWanderAvoidWater;
 import net.minecraft.entity.ai.EntityAIWatchClosest;
 import net.minecraft.entity.ai.EntityAIWatchClosest2;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityEvoker;
 import net.minecraft.entity.monster.EntityVex;
 import net.minecraft.entity.monster.EntityVindicator;
@@ -47,6 +48,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.InventoryBasic;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -59,6 +61,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -74,11 +77,16 @@ import net.minecraftforge.items.ItemStackHandler;
 import orangeVillager61.ImprovedVillagers.Config;
 import orangeVillager61.ImprovedVillagers.Iv;
 import orangeVillager61.ImprovedVillagers.Reference;
+import orangeVillager61.ImprovedVillagers.Entities.AI.IvVillagersBeingEvil;
 import orangeVillager61.ImprovedVillagers.Entities.AI.IvVilsPerDoor;
 import orangeVillager61.ImprovedVillagers.Entities.AI.VillagerAIFollowParent;
+import orangeVillager61.ImprovedVillagers.Entities.AI.VillagerAIHarvestMeat;
+import orangeVillager61.ImprovedVillagers.Entities.AI.VillagerAIInteract;
 import orangeVillager61.ImprovedVillagers.Entities.AI.VillagerAvoidEvilPlayer;
 import orangeVillager61.ImprovedVillagers.Entities.AI.VillagerFollowEmerald;
 import orangeVillager61.ImprovedVillagers.Entities.AI.VillagerFollowOwner;
+import orangeVillager61.ImprovedVillagers.Entities.AI.VillagerMoveIndoors;
+import orangeVillager61.ImprovedVillagers.Entities.AI.VillagerOpenDoor;
 import orangeVillager61.ImprovedVillagers.Entities.AI.VilsPerDoor;
 import orangeVillager61.ImprovedVillagers.Items.IvItems;
 import orangeVillager61.ImprovedVillagers.client.gui.GuiHandler;
@@ -95,28 +103,33 @@ public class IvVillager extends EntityVillager{
 	@ObjectHolder("minecraft:priest")
 	public static VillagerProfession PROFESSION_PRIEST = null;
 	
+	@ObjectHolder("minecraft:butcher")
+	public static VillagerProfession PROFESSION_BUTCHER = null;
+	
 	protected Village villageObj; 
 	public String name;
 	//public int gender;
     protected boolean isWillingToMate;
     private ItemStackHandler item_handler = new ItemStackHandler(15);
     protected int wealth;
-    public int robbed_time;
     protected MerchantRecipeList buyingList;
     protected static final DataParameter<Optional<UUID>> OWNER_DEFINED_ID = EntityDataManager.<Optional<UUID>>createKey(IvVillager.class, DataSerializers.OPTIONAL_UNIQUE_ID);
     //TODO Turn Adult Age into an Enum
+    private static final DataParameter<Integer> Work_Ticks = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
     private static final DataParameter<String> Adult_Age = EntityDataManager.<String>createKey(IvVillager.class, DataSerializers.STRING);
     private static final DataParameter<String> Tab = EntityDataManager.<String>createKey(IvVillager.class, DataSerializers.STRING);
     private static final DataParameter<Integer> int_Age = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
     private static final DataParameter<Boolean> Is_Hired = EntityDataManager.<Boolean>createKey(IvVillager.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Boolean> has_init = EntityDataManager.<Boolean>createKey(IvVillager.class, DataSerializers.BOOLEAN);
+    private static final DataParameter<Boolean> being_evil = EntityDataManager.<Boolean>createKey(IvVillager.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Integer> Hire_Cost = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
     private static final DataParameter<Float> True_Health = EntityDataManager.<Float>createKey(IvVillager.class, DataSerializers.FLOAT);
     private static final DataParameter<Boolean> Following = EntityDataManager.<Boolean>createKey(IvVillager.class, DataSerializers.BOOLEAN);
     private static final DataParameter<Integer> Gender = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
     private static final DataParameter<Optional<UUID>> Mother_ID = EntityDataManager.<Optional<UUID>>createKey(IvVillager.class, DataSerializers.OPTIONAL_UNIQUE_ID);
     private static final DataParameter<Optional<UUID>> Father_ID = EntityDataManager.<Optional<UUID>>createKey(IvVillager.class, DataSerializers.OPTIONAL_UNIQUE_ID);
-
+    private static final DataParameter<Integer> robbed_time = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
+    private static final DataParameter<Integer> evil_type = EntityDataManager.<Integer>createKey(IvVillager.class, DataSerializers.VARINT);
     private int careerId;
     private int careerLevel;
     private boolean isLookingForHome;
@@ -164,7 +177,6 @@ public class IvVillager extends EntityVillager{
 	    this.setGender(r.nextInt(2) + 1);
 	    this.name = this.random_name(this.getGender());
 	    this.setCustomNameTag(this.name);
-	    this.robbed_time = 0;
 	}
 	public IvVillager(World world, int professionId, int gender, String name) {
 		super(world, professionId);
@@ -175,7 +187,6 @@ public class IvVillager extends EntityVillager{
         this.setCustomNameTag(name);
         this.setVillagerAge();
 	    this.setHireCost(r.nextInt(21) + 20);
-	    this.robbed_time = 0;
 	}
 	public IvVillager(World world, int professionId, int gender, String name, UUID father_id, UUID mother_id) {
 		super(world, professionId);
@@ -185,12 +196,21 @@ public class IvVillager extends EntityVillager{
         this.name = name;
         this.setCustomNameTag(name);
         this.setVillagerAge();
+        if (this.getProfession() == 5)
+        {
+        	this.setEvilType(1);
+        }
 	    this.setHireCost(r.nextInt(21) + 20);
 	    this.setFatherId(father_id);
 	    this.setMotherId(mother_id);
-		this.setFatherName(this.world.getMinecraftServer().getEntityFromUuid(father_id).getCustomNameTag());
-		this.setMotherName(this.world.getMinecraftServer().getEntityFromUuid(mother_id).getCustomNameTag());
-	    this.robbed_time = 0;
+	    if (this.world.getMinecraftServer().getEntityFromUuid(father_id) != null)
+	    {
+			this.setFatherName(this.world.getMinecraftServer().getEntityFromUuid(father_id).getCustomNameTag());
+	    }
+	    if (this.world.getMinecraftServer().getEntityFromUuid(mother_id) != null)
+	    {
+			this.setMotherName(this.world.getMinecraftServer().getEntityFromUuid(mother_id).getCustomNameTag());
+	    }
 	}
 	public InventoryBasic getVillagerInventory()
     {
@@ -242,6 +262,7 @@ public class IvVillager extends EntityVillager{
                 if (this.getTrueHealth() > 0){
                     this.setHealth(this.getTrueHealth());
                 }
+                this.setAdultAge("Child");
             }
             else if (this.getAdultAge().equals("Elder"))
             {
@@ -290,13 +311,13 @@ public class IvVillager extends EntityVillager{
 			this.note_list.add(player_to_add);
 		}
 	}
-	public void addNoteList(UUID player_to_add, ItemStack itemstack, EntityPlayer playerC)
+	public void addNoteList(UUID player_to_add, ItemStack itemstack, EntityPlayer playerC, EntityPlayerSP playerSP)
 	{
 		if (!this.note_list.contains(player_to_add))
 		{
 			this.note_list.add(player_to_add);
         	itemstack.damageItem(1, playerC);
-        	((EntityPlayerSP) playerC).sendChatMessage("You will now receive notifications from " + this.getName());
+        	playerSP.sendChatMessage("You will now receive notifications from " + this.getName());
 		}
 	}
 	public ArrayList<UUID> getNoteList()
@@ -375,17 +396,21 @@ public class IvVillager extends EntityVillager{
     {
 		super.entityInit();
 		this.getDataManager().register(Gender, Integer.valueOf(0));
+		this.getDataManager().register(robbed_time, Integer.valueOf(0));
 		this.getDataManager().register(Mother_ID, Optional.<UUID>absent());
 		this.getDataManager().register(Father_ID, Optional.<UUID>absent());
 		this.getDataManager().register(int_Age, Integer.valueOf(1));
+		this.getDataManager().register(Work_Ticks, Integer.valueOf(0));
 		this.getDataManager().register(Adult_Age, String.valueOf(""));
 		this.getDataManager().register(Tab, String.valueOf("Info"));
 		this.getDataManager().register(mother_name, String.valueOf(""));
 		this.getDataManager().register(father_name, String.valueOf(""));
 		this.getDataManager().register(Is_Hired, Boolean.valueOf(false));
 		this.getDataManager().register(has_init, Boolean.valueOf(false));
+		this.getDataManager().register(being_evil, Boolean.valueOf(false));
 		this.getDataManager().register(Following, Boolean.valueOf(true));
 		this.getDataManager().register(Hire_Cost, Integer.valueOf(0));
+		this.getDataManager().register(evil_type, Integer.valueOf(-1));
 		this.getDataManager().register(True_Health, Float.valueOf(0));
         this.getDataManager().register(OWNER_DEFINED_ID, Optional.<UUID>absent());
     }
@@ -461,6 +486,14 @@ public class IvVillager extends EntityVillager{
     {
         this.dataManager.set(Hire_Cost, num);
     }
+	public int getRobbedTime()
+    {
+          return (int)this.dataManager.get(robbed_time);
+    }
+	protected void setRobbedTime(int num)
+    {
+        this.dataManager.set(robbed_time, num);
+    }
 	@Nullable
     public UUID getFatherId()
     {
@@ -493,6 +526,14 @@ public class IvVillager extends EntityVillager{
     {
           return (boolean)this.dataManager.get(Is_Hired);
     }
+	public void setBeingEvil(boolean bool)
+    {
+        this.dataManager.set(being_evil, bool);
+    }
+	public boolean getBeingEvil()
+    {
+          return (boolean)this.dataManager.get(being_evil);
+    }
 	protected void setHasInit(boolean bool)
     {
         this.dataManager.set(has_init, bool);
@@ -508,6 +549,22 @@ public class IvVillager extends EntityVillager{
 	public int getGender()
     {
           return (Integer)this.dataManager.get(Gender);
+    }
+	public void setWorkTicks(int num)
+    {
+        this.dataManager.set(Work_Ticks, num);
+    }
+	public int getWorkTicks()
+    {
+          return (Integer)this.dataManager.get(Work_Ticks);
+    }
+	public void setEvilType(int num)
+    {
+        this.dataManager.set(evil_type, num);
+    }
+	public int getEvilType()
+	{
+          return (Integer)this.dataManager.get(evil_type);
     }
 	public void setFollowing(boolean bool)
     {
@@ -554,6 +611,7 @@ public class IvVillager extends EntityVillager{
 
         }
 	}
+    //This changes the villager life stage
 	public void ivVillagerAdultAge(int lifeChangeNum){
 		if (world.isRemote == false){
         	if (this.isChild() == false){
@@ -598,12 +656,134 @@ public class IvVillager extends EntityVillager{
 	    {
 	        super.onLivingUpdate();
 	        this.ivVillagerAdultAge((Config.adult_days * 24000)/3);
-	        if (this.robbed_time > 0)
+	        if (this.getRobbedTime() > 0)
 	        {
-	        	this.robbed_time -= 1;
+	        	this.setRobbedTime(this.getRobbedTime() - 1);
+	        }
+	        if (this.getWorkTicks() > 0)
+	        {
+	        	this.setWorkTicks(this.getWorkTicks() - 1);
 	        }
 	        this.setMoreVillagerNbtStuff();
 	    }
+ 	@Override
+	public boolean getIsWillingToMate(boolean updateFirst)
+	    {
+	        if (!this.isWillingToMate && updateFirst && this.hasEnoughFoodToBreed())
+	        {
+	            boolean flag = false;
+
+	            for (int i = 0; i < this.villagerInventory.getSizeInventory(); ++i)
+	            {
+	                ItemStack itemstack = this.villagerInventory.getStackInSlot(i);
+
+	                if (!itemstack.isEmpty())
+	                {
+	                    if (itemstack.getItem() == Items.BREAD && itemstack.getCount() >= 3)
+	                    {
+	                        flag = true;
+	                        this.villagerInventory.decrStackSize(i, 3);
+	                    }
+	                    else if ((itemstack.getItem() == Items.POTATO || itemstack.getItem() == Items.CARROT || itemstack.getItem() == Items.BEETROOT) && itemstack.getCount() >= 12)
+	                    {
+	                        flag = true;
+	                        this.villagerInventory.decrStackSize(i, 12);
+	                    }
+	                    else if ((itemstack.getItem() == Items.COOKED_BEEF || itemstack.getItem() == Items.COOKED_CHICKEN || itemstack.getItem() == Items.COOKED_MUTTON || itemstack.getItem() == Items.COOKED_PORKCHOP) && itemstack.getCount() >= 2)
+	                    {
+	                        flag = true;
+	                        this.villagerInventory.decrStackSize(i, 2);
+	                    }
+	                }
+
+	                if (flag)
+	                {
+	                    this.world.setEntityState(this, (byte)18);
+	                    this.isWillingToMate = true;
+	                    break;
+	                }
+	            }
+	        }
+
+	        return this.isWillingToMate;
+	    }
+	    private boolean hasEnoughFood(int multiplier)
+	    {
+	        boolean flag = this.getProfession() == 0;
+	
+	        for (int i = 0; i < this.villagerInventory.getSizeInventory(); ++i)
+	        {
+	            ItemStack itemstack = this.villagerInventory.getStackInSlot(i);
+	
+	            if (!itemstack.isEmpty())
+	            {
+	                if (itemstack.getItem() == Items.BREAD && itemstack.getCount() >= 3 * multiplier || itemstack.getItem() == Items.POTATO && itemstack.getCount() >= 12 * multiplier || itemstack.getItem() == Items.CARROT && itemstack.getCount() >= 12 * multiplier || itemstack.getItem() == Items.BEETROOT && itemstack.getCount() >= 12 * multiplier)
+	                {
+	                    return true;
+	                }
+	
+	                if (flag && itemstack.getItem() == Items.WHEAT && itemstack.getCount() >= 9 * multiplier)
+	                {
+	                    return true;
+	                }
+	                if (flag && itemstack.getItem() == Items.COOKED_BEEF || itemstack.getItem() == Items.COOKED_CHICKEN || itemstack.getItem() == Items.COOKED_MUTTON || itemstack.getItem() == Items.COOKED_PORKCHOP && itemstack.getCount() >= 9 * multiplier)
+	                {
+	                    return true;
+	                }
+	            }
+	        }
+	
+	        return false;
+	    }
+ 		@Override
+	    public boolean wantsMoreFood()
+	    {
+	        if (this.getProfession() == 0 || this.getProfession() == 4)
+	        {
+	            return !this.hasEnoughFood(5);
+	        }
+	        else
+	        {
+	            return !this.hasEnoughFood(1);
+	        }
+	    }
+ 		@Override
+ 	    protected void updateEquipmentIfNeeded(EntityItem itemEntity)
+ 	    {
+ 	        ItemStack itemstack = itemEntity.getItem();
+ 	        Item item = itemstack.getItem();
+
+ 	        if (this.canVillagerPickupItem(item))
+ 	        {
+ 	            ItemStack itemstack1 = this.villagerInventory.addItem(itemstack);
+
+ 	            if (itemstack1.isEmpty())
+ 	            {
+ 	                itemEntity.setDead();
+ 	            }
+ 	            else
+ 	            {
+ 	                itemstack.setCount(itemstack1.getCount());
+ 	            }
+ 	        }
+ 	    }
+
+ 	    private boolean canVillagerPickupItem(Item itemIn)
+ 	    {
+ 	    	if (this.getRobbedTime() > 100)
+ 	    	{
+ 	    		return false;
+ 	    	}
+ 	        return itemIn == Items.BREAD || itemIn == Items.POTATO || itemIn == Items.CARROT || itemIn == Items.WHEAT || itemIn == Items.WHEAT_SEEDS || itemIn == Items.BEETROOT || itemIn == Items.BEETROOT_SEEDS 
+ 	        		|| itemIn == Items.EMERALD || itemIn == Items.COOKED_BEEF || itemIn == Items.COOKED_CHICKEN || itemIn == Items.COOKED_MUTTON || itemIn == Items.COOKED_PORKCHOP || itemIn == Items.PORKCHOP 
+ 	        		|| itemIn == Items.MUTTON || itemIn == Items.CHICKEN || itemIn == Items.BEEF;
+ 	    }
+	 	@Override
+	    public void setIsWillingToMate(boolean isWillingToMate)
+	    {
+	        this.isWillingToMate = isWillingToMate;
+	    }
+	 	
 	@Override
 	protected void onGrowingAdult()
     {
@@ -626,6 +806,7 @@ public class IvVillager extends EntityVillager{
 			BlockPos blockpos = new BlockPos(this);
 			this.villageObj = this.world.getVillageCollection().getNearestVillage(blockpos, 32);
 	        this.tasks.addTask(0, new EntityAISwimming(this));
+	        this.tasks.addTask(1, new VillagerMoveIndoors(this));
 	        this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityZombie.class, 8.0F, 0.6D, 0.6D));
 	        //this.tasks.addTask(1, new VillagerAvoidEvilPlayer(this, 8.0F, 0.6D, 0.6D, this.villageObj));
 	        this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityEvoker.class, 12.0F, 0.8D, 0.8D));
@@ -633,18 +814,17 @@ public class IvVillager extends EntityVillager{
 	        this.tasks.addTask(1, new EntityAIAvoidEntity(this, EntityVex.class, 8.0F, 0.6D, 0.6D));
 	        this.tasks.addTask(1, new EntityAIPanic(this, 0.8D));
 	        this.tasks.addTask(2, new VillagerAIFollowParent(this, 0.8D));
-	        this.tasks.addTask(1, new EntityAITradePlayer(this));
+	        this.tasks.addTask(2, new EntityAITradePlayer(this));
 	        this.tasks.addTask(2, new EntityAILookAtTradePlayer(this));
-	        this.tasks.addTask(2, new EntityAIMoveIndoors(this));
 	        this.tasks.addTask(3, new EntityAIRestrictOpenDoor(this));
-	        this.tasks.addTask(3, new EntityAITempt(this, 0.85D, Items.EMERALD, false));
+	        this.tasks.addTask(4, new EntityAITempt(this, 0.85D, Items.EMERALD, false));
 	        //this.tasks.addTask(3, new VillagerFollowEmerald(this, 0.9D, Items.EMERALD, false, this.villageObj));
 	        this.tasks.addTask(4, new EntityAIOpenDoor(this, true));
 	        this.tasks.addTask(5, new EntityAIMoveTowardsRestriction(this, 0.6D));
 	        this.tasks.addTask(5, new IvVilsPerDoor(this));
 	        this.tasks.addTask(7, new EntityAIFollowGolem(this));
-	        this.tasks.addTask(9, new EntityAIVillagerInteract(this));
-	        this.tasks.addTask(9, new EntityAIWanderAvoidWater(this, 0.6D));
+	        this.tasks.addTask(8, new VillagerAIInteract(this));
+	        this.tasks.addTask(8, new EntityAIWanderAvoidWater(this, 0.6D));
 	        this.tasks.addTask(10, new EntityAIWatchClosest2(this, EntityPlayer.class, 3.0F, 1.0F));
 	        this.tasks.addTask(10, new EntityAIWatchClosest(this, EntityLiving.class, 8.0F));
 		}
@@ -654,18 +834,25 @@ public class IvVillager extends EntityVillager{
         if (!this.areAdditionalTasksSet)
         {
             this.areAdditionalTasksSet = true;
-
             if (this.isChild())
             {
                 this.tasks.addTask(8, new EntityAIPlay(this, 0.32D));
             }
             else if (this.getProfessionForge() == PROFESSION_FARMER || this.getProfession() == 0)
             {
-                this.tasks.addTask(6, new EntityAIHarvestFarmland(this, 0.6D));
+                this.tasks.addTask(5, new EntityAIHarvestFarmland(this, 0.6D));
+            }
+            else if (this.getProfession() == 4 || this.getProfessionForge() == PROFESSION_BUTCHER)
+            {
+                this.tasks.addTask(5, new VillagerAIHarvestMeat(this));
+            }
+            else if (this.getProfession() == 5 && this.getEvilType() > 0)
+            {
+                this.tasks.addTask(5, new IvVillagersBeingEvil(this));
             }
             if (this.getHired())
             {
-                this.tasks.addTask(6, new VillagerFollowOwner(this, 0.9D, 6.0F, 1.5F));
+                this.tasks.addTask(5, new VillagerFollowOwner(this, 0.9D, 6.0F, 1.5F));
             }
         }
     }
@@ -679,11 +866,14 @@ public class IvVillager extends EntityVillager{
 		        compound.setInteger("Riches", this.wealth);
 	        	compound.setInteger("Gender", this.getGender());
 		        compound.setInteger("Int_Age", this.getIntAge());
+		        compound.setInteger("Work_Ticks", this.getWorkTicks());
 		        compound.setFloat("True_Health", this.getHealth());
 		        compound.setInteger("Hire_Cost", this.getHireCost());
+		        compound.setInteger("Evil_Type", this.getEvilType());
 		        compound.setBoolean("Is_Hired", this.getHired());
+		        compound.setBoolean("Being_Evil", this.getBeingEvil());
 		        compound.setInteger("Career", this.careerId);
-		        compound.setInteger("Robbed_Time", this.robbed_time);
+		        compound.setInteger("Robbed_Time", this.getRobbedTime());
 		        compound.setString("mother_name", this.getMotherName());
 		        compound.setString("father_name", this.getFatherName());
 		        compound.setString("tab", this.getTab());
@@ -792,8 +982,9 @@ public class IvVillager extends EntityVillager{
 		 }
 		 else if (button == 4)
 		 {
-			 this.setTab("Inventory");
-	     	 player.openGui(Iv.instance, GuiHandler.Inventory, world, getEntityId(), 0, 0);
+			 this.setTab("Info");
+	     	 //player.openGui(Iv.instance, GuiHandler.Inventory, world, getEntityId(), 0, 0);
+	     	 player.openGui(Iv.instance, GuiHandler.Info, world, getEntityId(), 0, 0);
 		 }
 	 }
 	 public void change_following()
@@ -814,6 +1005,72 @@ public class IvVillager extends EntityVillager{
 					e.printStackTrace();
 				}
 			}
+	 }
+	 public boolean getRobbed()
+	 {
+		 if (this.getRobbedTime() == 0)
+     	 {
+         	this.damageEntity(DamageSource.GENERIC, 2);
+         	this.playHurtSound(getLastDamageSource());
+         	for (int i = 0; i < this.villagerInventory.getSizeInventory(); ++i)
+             {
+                 ItemStack itemstacktosteal = this.villagerInventory.getStackInSlot(i);
+                 if (!itemstacktosteal.isEmpty() && !(rand.nextInt(4) == 0))
+                 {
+     	            double d0 = this.posY - 0.30000001192092896D + (double)this.getEyeHeight();
+     	            EntityItem entityitem = new EntityItem(this.world, this.posX, d0, this.posZ, itemstacktosteal);
+     	            float f = 0.3F;
+     	            float f1 = this.rotationYawHead;
+     	            float f2 = this.rotationPitch;
+     	            entityitem.motionX = (double)(-MathHelper.sin(f1 * 0.017453292F) * MathHelper.cos(f2 * 0.017453292F) * 0.3F);
+     	            entityitem.motionZ = (double)(MathHelper.cos(f1 * 0.017453292F) * MathHelper.cos(f2 * 0.017453292F) * 0.3F);
+     	            entityitem.motionY = (double)(-MathHelper.sin(f2 * 0.017453292F) * 0.3F + 0.1F);
+     	            entityitem.setDefaultPickupDelay();
+     	            this.world.spawnEntity(entityitem);
+     	            this.villagerInventory.setInventorySlotContents(i, ItemStack.EMPTY);
+                 }
+         	}
+         	if (rand.nextInt(4) == 0)
+         	{
+                 double d0 = this.posY - 0.30000001192092896D + (double)this.getEyeHeight();
+                 EntityItem entityitem = new EntityItem(this.world, this.posX, d0, this.posZ, new ItemStack(Items.EMERALD, 1));
+                 float f = 0.3F;
+                 float f1 = this.rotationYawHead;
+                 float f2 = this.rotationPitch;
+                 entityitem.motionX = (double)(-MathHelper.sin(f1 * 0.017453292F) * MathHelper.cos(f2 * 0.017453292F) * 0.3F);
+                 entityitem.motionZ = (double)(MathHelper.cos(f1 * 0.017453292F) * MathHelper.cos(f2 * 0.017453292F) * 0.3F);
+                 entityitem.motionY = (double)(-MathHelper.sin(f2 * 0.017453292F) * 0.3F + 0.1F);
+                 entityitem.setDefaultPickupDelay();
+                 this.world.spawnEntity(entityitem);
+                 this.world.spawnEntity(entityitem);
+         	}
+         	else
+         	{
+                 double d0 = this.posY - 0.30000001192092896D + (double)this.getEyeHeight();
+                 EntityItem entityitem = new EntityItem(this.world, this.posX, d0, this.posZ, new ItemStack(Items.EMERALD, 1));
+                 float f = 0.3F;
+                 float f1 = this.rotationYawHead;
+                 float f2 = this.rotationPitch;
+                 entityitem.motionX = (double)(-MathHelper.sin(f1 * 0.017453292F) * MathHelper.cos(f2 * 0.017453292F) * 0.3F);
+                 entityitem.motionZ = (double)(MathHelper.cos(f1 * 0.017453292F) * MathHelper.cos(f2 * 0.017453292F) * 0.3F);
+                 entityitem.motionY = (double)(-MathHelper.sin(f2 * 0.017453292F) * 0.3F + 0.1F);
+                 entityitem.setDefaultPickupDelay();
+                 this.world.spawnEntity(entityitem);
+         	}
+         	if (!this.world.isRemote && !(this.note_list == null))
+             {
+          	   for (int a = 0; a < this.getNoteList().size(); a++)
+          	   {
+          		   this.getNotePlayer(a).sendMessage(createChatComponent(this.getCustomNameTag() + " was robbed by a thief"));
+          	   }
+             }
+         	this.setRobbedTime(300);
+            return true;
+         }
+     	else
+     	{
+     		return false;
+     	}
 	 }
 	 @Override
 	 public void readEntityFromNBT(NBTTagCompound compound){
@@ -854,6 +1111,14 @@ public class IvVillager extends EntityVillager{
          {
              this.setFollowing(compound.getBoolean("Following"));
          }
+		 if (compound.hasKey("Being_Evil"))
+         {
+             this.setBeingEvil(compound.getBoolean("Being_Evil"));
+         }
+		 if (compound.hasKey("Work_Ticks"))
+         {
+             this.setWorkTicks(compound.getInteger("Work_Ticks"));
+         }
 		 if (compound.hasKey("Int_Age")){
 			 this.setIntAge(compound.getInteger("Int_Age"));
 		 }
@@ -863,10 +1128,16 @@ public class IvVillager extends EntityVillager{
 		 if (compound.hasKey("father_id")){
 			 this.setFatherId(compound.getUniqueId("father_id"));
 		 }
+		 if (compound.hasKey("evil_type")){
+			 this.setEvilType(compound.getInteger("evil_type"));
+		 }
 		 if (compound.hasKey("True_Health")){
 			 this.setTrueHealth(compound.getFloat("True_Health"));
 		 }
-		 this.robbed_time = compound.getInteger("Robbed_Time");
+		 if (compound.hasKey("Robbed_Time"))
+		 {
+			 this.setRobbedTime(compound.getInteger("Robbed_Time"));
+		 }
 		 if (compound.hasKey("Hire_Cost")){
 			 this.setHireCost(compound.getInteger("Hire_Cost"));
 		 }
@@ -897,15 +1168,14 @@ public class IvVillager extends EntityVillager{
 	        }
 
 		 this.setProfession(compound.getInteger("Profession"));
-	        if (compound.hasKey("ProfessionName"))
+		 if (compound.hasKey("ProfessionName"))
 	        {
 	            net.minecraftforge.fml.common.registry.VillagerRegistry.VillagerProfession p =
-	                net.minecraftforge.fml.common.registry.VillagerRegistry.instance().getRegistry().getValue(new net.minecraft.util.ResourceLocation(compound.getString("ProfessionName")));
+	                net.minecraftforge.fml.common.registry.ForgeRegistries.VILLAGER_PROFESSIONS.getValue(new net.minecraft.util.ResourceLocation(compound.getString("ProfessionName")));
 	            if (p == null)
-	                p = net.minecraftforge.fml.common.registry.VillagerRegistry.instance().getRegistry().getValue(new net.minecraft.util.ResourceLocation("minecraft:farmer"));
+	                p = net.minecraftforge.fml.common.registry.ForgeRegistries.VILLAGER_PROFESSIONS.getValue(new net.minecraft.util.ResourceLocation("minecraft:farmer"));
 	            this.setProfession(p);
-	        }
-	        this.wealth = compound.getInteger("Riches");
+	        }	        this.wealth = compound.getInteger("Riches");
 	        this.careerId = compound.getInteger("Career");
 	        this.careerLevel = compound.getInteger("CareerLevel");
 	        this.isWillingToMate = compound.getBoolean("Willing");
@@ -932,7 +1202,6 @@ public class IvVillager extends EntityVillager{
 	        this.setAdditionalAItasks();
 	        this.setMoreVillagerNbtStuff();
 	        this.setHasInit(true);
-		        	//this.setCustomNameTag(this.name);
 	 }
 	 protected void populateBuyingList()
 	    {
@@ -965,81 +1234,129 @@ public class IvVillager extends EntityVillager{
 	    }
 	 @Override
 	 public boolean processInteract(EntityPlayer player, EnumHand hand){
-		if (world.isRemote == false){
+		 if (Config.straight_to_trade == true)
+		 {
+	            if (this.buyingList == null)
+	            {
+	                this.populateBuyingList();
+	            }
+
+	            if (hand == EnumHand.MAIN_HAND)
+	            {
+	                player.addStat(StatList.TALKED_TO_VILLAGER);
+	            }
+
+	            if (!this.world.isRemote && !this.buyingList.isEmpty())
+	            {
+	                this.setCustomer(player);
+	                player.displayVillagerTradeGui(this);
+	                return true;
+	            }
+	            return false;
+		 }
+		 if (world.isRemote == false){
 			BlockPos blockpos = new BlockPos(this);
 			this.villageObj = this.world.getVillageCollection().getNearestVillage(blockpos, 32);
 
 		}
         ItemStack itemstack = player.getHeldItem(hand);
-        if (itemstack.getItem() == IvItems.thieving_nose && !this.isChild() && this.robbed_time == 0){
-        	itemstack.damageItem(1, player);
-        	this.setHealth(this.getHealth() - 2);
-        	this.playHurtSound(getLastDamageSource());
-        	int randy = rand.nextInt(10) + 1 ;
-        	if (randy < 6){
-        		
-        	}
-        	if (randy < 9 && randy  > 5){
-        		this.entityDropItem(new ItemStack(Items.EMERALD, r.nextInt(2) + 1), 0);
-        		if (rand.nextInt(2) == 0)
-        		{
-        			this.robbed_time = 1200;
-        		}
-        	}
-        	if (randy < 10 && randy + 1  > 8){
-        		this.entityDropItem(new ItemStack(Items.EMERALD, r.nextInt(5) + 1), 0);
-        		if (rand.nextInt(2) == 0)
-        		{
-        			this.robbed_time = 1200;
-        		}
-        	}
-        	if (world.isRemote == false){
-        	if (this.villageObj != null)
-	            {
-	        		this.villageObj.modifyPlayerReputation(player.getName(), -2);
-	            }
-        	}
-        	if (!this.world.isRemote && !(this.note_list == null))
-            {
-         	   for (int a = 0; a < this.getNoteList().size(); a++)
-         	   {
-         		   this.getNotePlayer(a).sendMessage(createChatComponent(this.getCustomNameTag() + " was robbed by " + player.getName()));
-         	   }
+        if (itemstack.getItem() == IvItems.thieving_nose){
+        	if (!this.isChild() && this.getRobbedTime() == 0)
+        	{
+        		itemstack.damageItem(1, player);
+            	this.damageEntity(DamageSource.causePlayerDamage(player), 2);
+            	this.playHurtSound(getLastDamageSource());
+            	for (int i = 0; i < this.villagerInventory.getSizeInventory(); ++i)
+                {
+                    ItemStack itemstacktosteal = this.villagerInventory.getStackInSlot(i);
+                    if (!itemstacktosteal.isEmpty() && !(rand.nextInt(4) == 0))
+                    {
+        	            double d0 = this.posY - 0.30000001192092896D + (double)this.getEyeHeight();
+        	            EntityItem entityitem = new EntityItem(this.world, this.posX, d0, this.posZ, itemstacktosteal);
+        	            float f = 0.3F;
+        	            float f1 = this.rotationYawHead;
+        	            float f2 = this.rotationPitch;
+        	            entityitem.motionX = (double)(-MathHelper.sin(f1 * 0.017453292F) * MathHelper.cos(f2 * 0.017453292F) * 0.3F);
+        	            entityitem.motionZ = (double)(MathHelper.cos(f1 * 0.017453292F) * MathHelper.cos(f2 * 0.017453292F) * 0.3F);
+        	            entityitem.motionY = (double)(-MathHelper.sin(f2 * 0.017453292F) * 0.3F + 0.1F);
+        	            entityitem.setDefaultPickupDelay();
+        	            this.world.spawnEntity(entityitem);
+        	            this.villagerInventory.setInventorySlotContents(i, ItemStack.EMPTY);
+                    }
+            	}
+            	if (rand.nextInt(4) == 0)
+            	{
+                    double d0 = this.posY - 0.30000001192092896D + (double)this.getEyeHeight();
+                    EntityItem entityitem = new EntityItem(this.world, this.posX, d0, this.posZ, new ItemStack(Items.EMERALD, 1));
+                    float f = 0.3F;
+                    float f1 = this.rotationYawHead;
+                    float f2 = this.rotationPitch;
+                    entityitem.motionX = (double)(-MathHelper.sin(f1 * 0.017453292F) * MathHelper.cos(f2 * 0.017453292F) * 0.3F);
+                    entityitem.motionZ = (double)(MathHelper.cos(f1 * 0.017453292F) * MathHelper.cos(f2 * 0.017453292F) * 0.3F);
+                    entityitem.motionY = (double)(-MathHelper.sin(f2 * 0.017453292F) * 0.3F + 0.1F);
+                    entityitem.setDefaultPickupDelay();
+                    this.world.spawnEntity(entityitem);
+                    this.world.spawnEntity(entityitem);
+            	}
+            	else
+            	{
+                    double d0 = this.posY - 0.30000001192092896D + (double)this.getEyeHeight();
+                    EntityItem entityitem = new EntityItem(this.world, this.posX, d0, this.posZ, new ItemStack(Items.EMERALD, 1));
+                    float f = 0.3F;
+                    float f1 = this.rotationYawHead;
+                    float f2 = this.rotationPitch;
+                    entityitem.motionX = (double)(-MathHelper.sin(f1 * 0.017453292F) * MathHelper.cos(f2 * 0.017453292F) * 0.3F);
+                    entityitem.motionZ = (double)(MathHelper.cos(f1 * 0.017453292F) * MathHelper.cos(f2 * 0.017453292F) * 0.3F);
+                    entityitem.motionY = (double)(-MathHelper.sin(f2 * 0.017453292F) * 0.3F + 0.1F);
+                    entityitem.setDefaultPickupDelay();
+                    this.world.spawnEntity(entityitem);
+            	}
+            	if (world.isRemote == false){
+            	if (this.villageObj != null)
+    	            {
+    	        		this.villageObj.modifyPlayerReputation(player.getName(), -2);
+    	            }
+            	}
+            	if (!this.world.isRemote && !(this.note_list == null))
+                {
+             	   for (int a = 0; a < this.getNoteList().size(); a++)
+             	   {
+             		   this.getNotePlayer(a).sendMessage(createChatComponent(this.getCustomNameTag() + " was robbed by " + player.getName()));
+             	   }
+                }
+            	this.setRobbedTime(300);
+                return true;
             }
-            return true;
-        }
+        	else
+        	{
+        		return false;
+        	}
+        }	
         else if (itemstack.getItem() == IvItems.notification_marker)
         {
-        	this.addNoteList(player.getUniqueID(), itemstack, player);
+        	this.addNoteList(player.getUniqueID(), itemstack, player, (EntityPlayerSP) player);
         	itemstack.damageItem(1, player);
         	return true;
         }
         else if (this.getTab().equals("Hire"))
         {
-        	if (!world.isRemote) {
-        		player.openGui(Iv.instance, GuiHandler.Hire, world, getEntityId(), 0, 0);
-        	}
+        	player.openGui(Iv.instance, GuiHandler.Hire, world, getEntityId(), 0, 0);
         	return true;
         }
         else if (this.getTab() == "Info")
         {
-        	if (!world.isRemote) {
-        		player.openGui(Iv.instance, GuiHandler.Info, world, getEntityId(), 0, 0);
-        		}
+        	player.openGui(Iv.instance, GuiHandler.Info, world, getEntityId(), 0, 0);
         	return true;
         }
         else if (this.getTab().equals("Hauler"))
         {
-        	if (!world.isRemote) {
-        		player.openGui(Iv.instance, GuiHandler.Hauler, world, getEntityId(), 0, 0);
-        		}
+        	player.openGui(Iv.instance, GuiHandler.Hauler, world, getEntityId(), 0, 0);
         	return true;
         }
         else if (this.getTab().equals("Inventory"))
         {
-        	if (!world.isRemote) {
-        		player.openGui(Iv.instance, GuiHandler.Inventory, world, getEntityId(), 0, 0);
-        		}
+    
+        	player.openGui(Iv.instance, GuiHandler.Inventory, world, getEntityId(), 0, 0);
         	return true;
         }
         else if (!this.holdingSpawnEggOfClass(itemstack, EntityVillager.class) && this.isEntityAlive() && !this.isChild())
